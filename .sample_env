@@ -1,0 +1,29 @@
+# MySQL Database Config 
+#
+#
+MYSQL_HOST=localhost
+MYSQL_USER=root
+MYSQL_PASS=pass
+MYSQL_DB=stockml
+
+# Loglevel verbose,info
+log_level = info
+
+# Application settings
+#
+# On / Off
+traderbot = 1
+live_emulator = 0
+backtest_emulator = 1
+evaluator = 0
+
+#Binance
+#
+#
+BINANCE_APIKEY= 
+BINANCE_APISECRET= 
+
+
+#HTTP API
+http_api = 1
+http_port = 3001

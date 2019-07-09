@@ -1,0 +1,30 @@
+{
+  "name": "StockML-API",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --max-old-space-size=8192 --experimental-worker .",
+    "test": "node test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@koa/cors": "^2.2.3",
+    "@tensorflow/tfjs-node": "^1.1.2",
+    "axios": ">=0.19.0",
+    "bfx-hf-indicators": "^1.0.2",
+    "co-body": "^6.0.0",
+    "dotenv": "^8.0.0",
+    "koa": "^2.7.0",
+    "koa-router": "^7.4.0",
+    "lodash": "^4.17.11",
+    "math": "0.0.3",
+    "mathjs": "^5.10.0",
+    "mysql2": "^1.6.5",
+    "node-binance-api": "^0.9.1",
+    "synaptic": "^1.1.4",
+    "winston": "^3.2.1"
+  }
+}

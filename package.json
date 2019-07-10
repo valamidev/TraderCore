@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node --max-old-space-size=8192 --experimental-worker .",
+    "dev": "node ./node_modules/nodemon/bin/nodemon.js --watch app --watch src/strategies index.js",
     "test": "node test.js"
   },
   "keywords": [],
@@ -26,5 +27,8 @@
     "synaptic": "^1.1.4",
     "talib": "^1.1.2",
     "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.1"
   }
 }

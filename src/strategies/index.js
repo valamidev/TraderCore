@@ -73,6 +73,15 @@ const strategies = [
       massIndex_limit: [8, 11, "float", 2],
       stop_loss_limit: [0.9, 0.93, "float", 3]
     }
+  },
+
+  {
+    guid: 7,
+    name: "thurtle",
+    desc: "Thurtle algorithm",
+    config: {
+      stop_loss_limit: [0.9, 0.93, "float", 3]
+    }
   }
 ];
 

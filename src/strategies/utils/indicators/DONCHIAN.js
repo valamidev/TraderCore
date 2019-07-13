@@ -32,8 +32,12 @@ Indicator.prototype.update = function(candle) {
   for (let i = 0; i < this.buffer.length; i++) {
     const elem = this.buffer[i];
 
-    this.result.min = Math.min(this.result.min, elem.low);
-    this.result.max = Math.max(this.result.max, elem.high);
+    if (elem.low < this.result.min) {
+      this.result.min = elem.low;
+    }
+    if (elem.high > this.result.max) {
+      this.result.max = elem.high;
+    }
   }
 
   this.result.middle = (this.result.min + this.result.max) / 2;

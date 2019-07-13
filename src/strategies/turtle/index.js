@@ -32,7 +32,7 @@ class Strategy {
       donc_short: 10,
       donc_mid: 20,
       donc_long: 55,
-      atr: 14,
+      atr: 20,
       rsi_low: 40,
       rsi_high: 40,
       stop_loss_limit: 0.85
@@ -71,6 +71,13 @@ class Strategy {
 
     this.stop_loss = new STOPLOSS(config.stop_loss_limit);
     // Indicators
+
+    // Thurtle variables
+    // Needed for Entry rules
+    this.last_entry_type = "none";
+    this.last_trade_profit = 0;
+    this.buy_price = 0;
+    this.sell_price = 0;
 
     // Buffer
     this.BUF = {
@@ -164,38 +171,15 @@ class Strategy {
     this.stop_loss.update(this.BUF.candle[this.step]);
   }
 
-  async BUY() {
+  async BUY(entry_type) {
     if (this.advice == "BUY") {
       return;
     }
 
-    this.current_trade.buy_price = this.BUF.candle[this.step].close;
-
-    this.current_trade.buy_in = [];
-
-    // Machine learning datas
-    for (let k = 5; k >= 0; k--) {
-      this.current_trade.buy_in.push(this.BUF.obi[this.step - k]);
-      this.current_trade.buy_in.push(this.BUF.x_smma[this.step - k]);
-      this.current_trade.buy_in.push(this.BUF.trix[this.step - k]);
-      this.current_trade.buy_in.push(this.BUF.rsi[this.step - k]);
-    }
-
-    if (this.predict_on == 1) {
-      let predict = await ml_api.predict(this.current_trade.buy_in, "lstm");
-
-      console.log(predict);
-
-      if (predict["0"] > 0.5) {
-        // Machine learning
-        this.advice = "BUY";
-        this.stop_loss.updatePrice(this.BUF.candle[this.step]);
-      }
-    } else {
-      // No Machine learning
-      this.advice = "BUY";
-      this.stop_loss.updatePrice(this.BUF.candle[this.step]);
-    }
+    this.advice = "BUY";
+    this.stop_loss.updatePrice(this.BUF.candle[this.step]);
+    this.buy_price = this.BUF.candle[this.step].close;
+    this.last_entry_type = entry_type;
   }
 
   async SELL() {
@@ -203,15 +187,10 @@ class Strategy {
       return;
     }
 
-    if (this.current_trade.buy_in.length > 0) {
-      this.advice = "SELL";
-
-      if (this.learn == 1) {
-        this.current_trade.sell_price = this.BUF.candle[this.step].close;
-        this.trade_history.push(this.current_trade);
-        this.reset_current_trade();
-      }
-    }
+    this.advice = "SELL";
+    this.sell_price = this.BUF.candle[this.step].close;
+    this.trade_profit();
+    this.last_entry_type = "none";
   }
 
   async update(candledata) {
@@ -225,19 +204,46 @@ class Strategy {
         // Stop loss sell
         if (this.stop_loss.action == "stoploss") {
           await this.SELL();
+          return;
         }
 
-        let rsi = this.BUF.rsi[this.step];
-
-        if (rsi > this.rsi_low) {
-          // Buy
-          await this.BUY();
+        // Entry - The price breaks out of a 20-day + The previous trade was a losing one
+        if (
+          this.BUF.candle[this.step].high >= this.BUF.donc_mid[this.step].max &&
+          this.last_trade_profit < 0
+        ) {
+          await this.BUY("20day");
+          return;
         }
 
-        // Sell
-        if (rsi < this.rsi_high) {
+        // Entry -  The price breaks out of a 55-day Donchian channel.
+        if (
+          this.BUF.candle[this.step].high >= this.BUF.donc_long[this.step].max
+        ) {
+          await this.BUY("55day");
+          return;
+        }
+
+        // 20-day channel, you need to exit at the breakout of the opposite 10-day channel.
+        if (
+          this.BUF.candle[this.step].low <=
+            this.BUF.donc_short[this.step].min &&
+          this.last_entry_type == "20day"
+        ) {
           await this.SELL();
+          return;
         }
+
+        // 55-day
+        if (
+          this.BUF.candle[this.step].low <= this.BUF.donc_mid[this.step].min &&
+          this.last_entry_type == "55day"
+        ) {
+          await this.SELL();
+          return;
+        }
+
+        //
       }
 
       // Successful update increase step
@@ -245,6 +251,10 @@ class Strategy {
     } catch (e) {
       logger.error("Emulator error ", e);
     }
+  }
+
+  trade_profit() {
+    this.last_trade_profit = this.sell_price - this.buy_price;
   }
 }
 

@@ -77,8 +77,8 @@ const strategies = [
 
   {
     guid: 7,
-    name: "thurtle",
-    desc: "Thurtle algorithm",
+    name: "turtle",
+    desc: "Turtle algorithm",
     config: {
       stop_loss_limit: [0.9, 0.93, "float", 3]
     }

@@ -19,6 +19,7 @@ const SMA = require("../utils/indicators/SMA");
 const MACD = require("../utils/indicators/MACD");
 
 const DONC = require("../utils/indicators/DONCHIAN");
+const ATR = require("../utils/indicators/ATR");
 
 const STOPLOSS = require("../utils/indicators/STOPLOSS");
 
@@ -28,8 +29,10 @@ const ml_api = require("../utils/ml_api");
 class Strategy {
   constructor(
     config = {
-      buy_signal_lenght: 1,
-      sell_signal_lenght: 1,
+      donc_short: 10,
+      donc_mid: 20,
+      donc_long: 55,
+      atr: 14,
       rsi_low: 40,
       rsi_high: 40,
       stop_loss_limit: 0.85
@@ -45,12 +48,9 @@ class Strategy {
     // General Strategy config
 
     // Strategy config
-    this.buy_signal_lenght = config.buy_signal_lenght;
-    this.sell_signal_lenght = config.sell_signal_lenght;
     this.rsi_low = config.rsi_low;
     this.rsi_high = config.rsi_high;
 
-    this.stop_loss_limit = config.stop_loss_limit;
     // Strategy config
 
     // Indicators
@@ -63,9 +63,13 @@ class Strategy {
     this.sma = new SMA(5);
     this.macd = new MACD({ short: 12, long: 26, signal: 5 });
 
-    this.donc = new DONC(20);
+    this.donc_short = new DONC(config.donc_short);
+    this.donc_mid = new DONC(config.donc_mid);
+    this.donc_long = new DONC(config.donc_long);
 
-    this.stop_loss = new STOPLOSS(this.stop_loss_limit);
+    this.atr = new ATR(config.atr);
+
+    this.stop_loss = new STOPLOSS(config.stop_loss_limit);
     // Indicators
 
     // Buffer
@@ -82,7 +86,10 @@ class Strategy {
       sma: [],
       macd_result: [],
       macd_signal: [],
-      donc: []
+      donc_short: [],
+      donc_mid: [],
+      donc_long: [],
+      atr: []
     };
     // Buffer
 
@@ -140,8 +147,18 @@ class Strategy {
     this.BUF.macd_signal.push(this.macd.signal.result);
 
     // Donchain
-    this.donc.update(candle);
-    this.BUF.donc.push(this.donc.result);
+    this.donc_short.update(candle);
+    this.BUF.donc_short.push(this.donc_short.result);
+
+    this.donc_mid.update(candle);
+    this.BUF.donc_mid.push(this.donc_mid.result);
+
+    this.donc_long.update(candle);
+    this.BUF.donc_long.push(this.donc_long.result);
+
+    // Avarage True Range
+    this.atr.update(candle);
+    this.BUF.atr.push(this.atr.result);
 
     // Stop loss
     this.stop_loss.update(this.BUF.candle[this.step]);

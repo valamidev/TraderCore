@@ -67,7 +67,7 @@ class HttpAPI {
 
       const symbols = ["BTCUSDT"];
 
-      await Backtest.start(symbols, "binance", 900, "multi_trend_algo");
+      await Backtest.start(symbols, "binance", 900, "thurtle");
 
       let response = {
         actions: Backtest.actions,

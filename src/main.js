@@ -1,15 +1,25 @@
 "use strict";
 const logger = require("./logger");
 const _ = require("lodash");
-const HTTP_API = new (require("./httpAPI"))(process.env.http_port);
+
+const {
+  evaluator,
+  live_emulator,
+  http_api,
+  backtest_emulator,
+  traderbot,
+  sentiment,
+  http_port
+} = process.env;
 
 const tradepairs = require("./tradepairs/tradepairs");
+const HTTP_API = new (require("./httpAPI"))(http_port);
 
 async function main() {
   try {
     logger.info("Things started");
 
-    if (process.env.evaluator == 1) {
+    if (evaluator == 1) {
       const Evaluator = require("./strategy_evaluator");
 
       Evaluator.start();
@@ -17,43 +27,42 @@ async function main() {
       //HTTP_API.add_evaluation("evaluation", Evaluator);
     }
 
-    if (process.env.live_emulator == 1) {
+    if (live_emulator == 1) {
       const Live_emulator = require("./emulator/live_emulator");
 
       Live_emulator.start();
 
-      if (process.env.http_api == 1) {
+      if (http_api == 1) {
         HTTP_API.add_live_strategyAPI("live", Live_emulator);
       }
     }
 
-    if (process.env.backtest_emulator == 1) {
+    if (backtest_emulator == 1) {
       const BacktestEmulator = require("./emulator/backtest_emulator");
 
-      if (process.env.http_api == 1) {
+      if (http_api == 1) {
         HTTP_API.add_backtestAPI("backtest", BacktestEmulator, tradepairs);
       }
     }
 
-    if (process.env.traderbot == 1) {
+    if (traderbot == 1) {
       const trader_bot = require("./traderbot/traderbot");
 
       await trader_bot.start();
 
-      if (process.env.http_api == 1) {
+      if (http_api == 1) {
         HTTP_API.add_tradebotAPI("tradebot", trader_bot);
       }
     }
 
-    if (process.env.http_api == 1) {
+    if (http_api == 1) {
       const strategies = require("./strategies");
 
       HTTP_API.add_candlechartAPI("candle", tradepairs);
       HTTP_API.add_strategyAPI("strategies", strategies);
     }
 
-    // Sentiment
-    if (process.env.sentiment == 1) {
+    if (sentiment == 1) {
       const sentimentAPI = require("./sentiment/sentiment");
       let twitter_eth = await sentimentAPI.twitter_chart("BAT", 0, 3600);
 

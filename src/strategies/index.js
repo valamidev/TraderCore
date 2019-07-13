@@ -80,6 +80,9 @@ const strategies = [
     name: "turtle",
     desc: "Turtle algorithm",
     config: {
+      donc_short: [5, 10, "int"],
+      donc_mid: [15, 30, "int"],
+      donc_long: [45, 70, "int"],
       stop_loss_limit: [0.9, 0.93, "float", 3]
     }
   }

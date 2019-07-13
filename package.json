@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node --max-old-space-size=8192 --experimental-worker .",
-    "dev": "node ./node_modules/nodemon/bin/nodemon.js --watch app --watch src/strategies index.js",
+    "dev": "node ./node_modules/nodemon/bin/nodemon.js --watch app --watch src index.js",
     "test": "node test.js"
   },
   "keywords": [],

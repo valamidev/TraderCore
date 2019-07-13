@@ -40,6 +40,7 @@ class BacktestEmulator {
         this.simulations[i].strategy = strategy;
         this.simulations[i].strategy_config = strategy_config;
 
+        // No initialized candledata
         if (candledata.length == 0) {
           candledata = await tradepairs.get_candlestick(
             this.simulations[i].exchange,

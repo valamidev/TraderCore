@@ -33,9 +33,7 @@ class Strategy {
       donc_mid: 20,
       donc_long: 55,
       atr: 20,
-      rsi_low: 40,
-      rsi_high: 40,
-      stop_loss_limit: 0.85
+      stop_loss_limit: 0.9
     }
   ) {
     // General Strategy config
@@ -46,12 +44,6 @@ class Strategy {
     this.predict_on = 0;
     this.learn = 1;
     // General Strategy config
-
-    // Strategy config
-    this.rsi_low = config.rsi_low;
-    this.rsi_high = config.rsi_high;
-
-    // Strategy config
 
     // Indicators
     this.bb = new BB({ TimePeriod: 21, NbDevUp: 1.7, NbDevDn: 1.7 });
@@ -204,7 +196,6 @@ class Strategy {
         // Stop loss sell
         if (this.stop_loss.action == "stoploss") {
           await this.SELL();
-          return;
         }
 
         // Entry - The price breaks out of a 20-day + The previous trade was a losing one
@@ -213,7 +204,6 @@ class Strategy {
           this.last_trade_profit < 0
         ) {
           await this.BUY("20day");
-          return;
         }
 
         // Entry -  The price breaks out of a 55-day Donchian channel.
@@ -221,7 +211,6 @@ class Strategy {
           this.BUF.candle[this.step].high >= this.BUF.donc_long[this.step].max
         ) {
           await this.BUY("55day");
-          return;
         }
 
         // 20-day channel, you need to exit at the breakout of the opposite 10-day channel.
@@ -231,16 +220,14 @@ class Strategy {
           this.last_entry_type == "20day"
         ) {
           await this.SELL();
-          return;
         }
 
-        // 55-day
+        // 55-day,  you need to exit at the breakout of the opposite 20-day channel.
         if (
           this.BUF.candle[this.step].low <= this.BUF.donc_mid[this.step].min &&
           this.last_entry_type == "55day"
         ) {
           await this.SELL();
-          return;
         }
 
         //

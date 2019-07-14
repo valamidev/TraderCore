@@ -9,6 +9,7 @@ const {
   backtest_emulator,
   traderbot,
   sentiment,
+  account,
   http_port
 } = process.env;
 
@@ -60,6 +61,12 @@ async function main() {
 
       HTTP_API.add_candlechartAPI("candle", tradepairs);
       HTTP_API.add_strategyAPI("strategies", strategies);
+    }
+
+    if (account == 1) {
+      const Accounts = require("./accounts");
+
+      Accounts.start();
     }
 
     if (sentiment == 1) {

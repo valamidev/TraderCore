@@ -204,10 +204,11 @@ class Strategy {
           await this.SELL();
         }
       }
-
-      this.step++;
     } catch (e) {
       logger.error("Emulator error ", e);
+    } finally {
+      // Successful update increase step
+      this.step++;
     }
   }
 

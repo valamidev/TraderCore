@@ -1,7 +1,7 @@
 "use strict";
 const _ = require("lodash");
 const logger = require("../logger");
-const pool = require("../database");
+const { pool } = require("../database");
 const util = require("../utils");
 const strategies = require("../strategies/index");
 const tradepairs = require("../tradepairs/tradepairs");

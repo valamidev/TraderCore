@@ -3,7 +3,7 @@
 const _ = require("lodash");
 const logger = require("../../logger");
 const util = require("../../utils");
-const pool = require("../../database");
+const { pool } = require("../../database");
 
 class TwitterAPI {
   async create_twitter_chart(asset, from_time = 0, interval_in_sec = 900) {

@@ -4,7 +4,7 @@ const util = require("../utils");
 const _ = require("lodash");
 const tradepairs = require("../tradepairs/tradepairs");
 const Emulator = require("./emulator");
-const pool = require("../database");
+const { pool } = require("../database");
 
 class BacktestEmulator {
   constructor(config) {

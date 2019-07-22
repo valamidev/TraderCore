@@ -1,6 +1,6 @@
 "use strict";
 const logger = require("../logger");
-const pool = require("../database");
+const { pool } = require("../database");
 
 const trade_util = {
   insert_account_trades: async (resp, instance_id) => {

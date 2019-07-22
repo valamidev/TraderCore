@@ -4,7 +4,7 @@ const _ = require("lodash");
 const trade_util = require("./trade_utils");
 const util = require("../utils");
 const logger = require("../logger");
-const pool = require("../database");
+const { pool } = require("../database");
 const binance = require("../exchange/Binance");
 
 const TradeInstance = require("./trade_instance");

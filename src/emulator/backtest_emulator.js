@@ -31,7 +31,7 @@ class BacktestEmulator {
     candledata = []
   ) {
     try {
-      this.simulations = await this.load_backtest(symbols, exchange, intervals);
+      this.simulations = await this.load_backtest(symbols, exchange);
 
       let promise_start = [];
 
@@ -45,7 +45,7 @@ class BacktestEmulator {
           candledata = await tradepairs.get_candlestick(
             this.simulations[i].exchange,
             this.simulations[i].symbol,
-            this.simulations[i].interval_sec,
+            intervals,
             this.config.back_test_limit
           );
         }
@@ -174,11 +174,11 @@ class BacktestEmulator {
     util.file_append(this.config.file_name, JSON.stringify(histories));
   }
 
-  async load_backtest(symbols, exchange, intervals) {
+  async load_backtest(symbols, exchange) {
     try {
       let [rows] = await pool.query(
-        "SELECT `symbol`,`exchange`,`interval_sec` FROM `tradepairs` WHERE `exchange` = ? and `interval_sec` = ? and `symbol` IN (?);",
-        [exchange, intervals, symbols]
+        "SELECT m.exchange,m.id,m.symbol,m.baseId,m.quoteId,t.interval_sec FROM `tradepairs` as t JOIN `market_datas` as m ON t.symbol = m.symbol AND t.exchange = m.exchange WHERE m.`exchange` = ? and  m.`symbol` IN (?);",
+        [exchange, symbols]
       );
 
       return rows;

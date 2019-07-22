@@ -65,9 +65,9 @@ class HttpAPI {
         live_update: 0
       });
 
-      const symbols = ["BTCUSDT"];
+      const symbols = ["BTC/USDT"];
 
-      await Backtest.start(symbols, "binance", 300, "turtle");
+      await Backtest.start(symbols, "binance", 240, "turtle");
 
       let response = {
         actions: Backtest.actions,

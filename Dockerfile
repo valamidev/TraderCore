@@ -13,7 +13,7 @@ RUN npm install -g --production node-gyp \
 # Install dependencies
 COPY package.json .
 RUN npm install \
-    npm cache clean --force
+    && npm cache clean --force
 
 # Bundle app source
 COPY . /usr/src/app

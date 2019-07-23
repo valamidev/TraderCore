@@ -80,3 +80,4 @@ package-lock.json
 
 # Tensorflow train datas
 *.tf
+ccxt_config.json

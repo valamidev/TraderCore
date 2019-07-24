@@ -65,7 +65,7 @@ class TradeInstance {
 
       logger.info(`SYMBOL: ${this.symbol} SELL QUANTITY: ${quantity}`)
 
-      if (quantity > 0) {
+      if (quantity > 0 || this.asset_balance - quantity < 0) {
         let response = await this.exchangeAPI.create_limit_sell_order(this.symbol, quantity, price)
 
         if (response) {
@@ -103,7 +103,7 @@ class TradeInstance {
 
       logger.info(`SYMBOL: ${this.symbol} BUY QUANTITY: ${quantity}`)
 
-      if (quantity > 0) {
+      if (quantity > 0 || this.quote_balance - quote_limit < 0) {
         let response = await this.exchangeAPI.create_limit_buy_order(this.symbol, quantity, price)
 
         if (response) {
@@ -146,11 +146,12 @@ class TradeInstance {
       let order = await trade_util.get_last_trades_by_instance(this.instanceID)
 
       if (order.length != 0) {
-        let order_info = await this.exchangeAPI.fetchOrder(order[0].id, order[0].symbol)
+        order.map(async (order) => {
+          let order_info = await this.exchangeAPI.fetchOrder(order.id, order.symbol)
 
-        logger.verbose(order_info)
+          logger.verbose(order_info)
 
-        /*
+          /*
           info: {}
           type: 'limit',
           side: 'sell',
@@ -163,19 +164,20 @@ class TradeInstance {
           status: 'open', / 'closed', / 'canceled'
         */
 
-        if (order_info.status == "open") {
-          logger.verbose(`Open order ${order_info.id} , ${order_info.amount}/${order_info.filled} , ${order_info.price}`)
-        }
+          if (order_info.status == "open") {
+            logger.verbose(`Open order ${order_info.id} , ${order_info.amount}/${order_info.filled} , ${order_info.price}`)
+          }
 
-        if (order_info.status == "closed") {
-          logger.verbose(`Order filled ${order_info.id} , ${order_info.filled} , ${order_info.price}`)
+          if (order_info.status == "closed") {
+            logger.verbose(`Order filled ${order_info.id} , ${order_info.filled} , ${order_info.price}`)
 
-          await this.book_order(order_info)
-        }
+            await this.book_order(order_info)
+          }
 
-        if (order_info.status == "canceled") {
-          await this.book_order(order_info)
-        }
+          if (order_info.status == "canceled") {
+            await this.book_order(order_info)
+          }
+        })
       }
     } catch (e) {
       logger.error("Trade instance order check error ", e)

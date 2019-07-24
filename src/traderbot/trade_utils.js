@@ -74,10 +74,9 @@ const trade_util = {
 
   get_last_trades_by_instance: async (instance_id) => {
     try {
-      let [rows] = await pool.query(
-        "SELECT * FROM `account_orders` WHERE `instance_id` = ? AND `type` LIKE 'LIMIT' AND `closed` = 0 ORDER BY `account_orders`.`time` DESC LIMIT 1;",
-        [instance_id]
-      )
+      let [rows] = await pool.query("SELECT * FROM `account_orders` WHERE `instance_id` = ? AND `type` LIKE 'LIMIT' AND `closed` = 0 ORDER BY `account_orders`.`time` DESC;", [
+        instance_id
+      ])
 
       return rows
     } catch (e) {

@@ -48,9 +48,12 @@ class Traderbot {
 
   async load_instances() {
     try {
+      // Only load new instances, re-load is not an option anymore
       let instances = await this.load_trade_instances_db()
 
-      let new_instances = []
+      let old_instances = this.trade_instances.map((elem) => elem.instanceID)
+
+      instances = instances.filter((elem) => old_instances.indexOf(elem.guid) < 0)
 
       instances.map((elem) => {
         let new_instance = new TradeInstance({
@@ -67,12 +70,12 @@ class Traderbot {
           order_quote_balance: elem.order_quote_balance
         })
 
-        new_instances.push(new_instance)
+        logger.verbose(`Tradebot new instances loaded, guid: ${elem.strategy_guid}`)
+
+        this.trade_instances.push(new_instance)
       })
 
-      this.trade_instances = new_instances
-
-      logger.verbose(`Tradebot instances loaded, count: ${this.trade_instances.length}`)
+      return
     } catch (e) {
       logger.error("Tradebot error!", e)
     }

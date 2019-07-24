@@ -36,10 +36,15 @@ class TradeInstance {
 
       // Check values
       if (typeof advice.action != "undefined" || typeof advice.close != "undefined") {
+        // All in trades can have undefined or 0 quantities
+        if (typeof advice.quantity == "undefined") {
+          advice.quantity = 0
+        }
+
         if (advice.action == "BUY") {
-          await this.buy(advice.close)
+          await this.buy(advice.close, advice.quantity)
         } else if (advice.action == "SELL") {
-          await this.sell(advice.close)
+          await this.sell(advice.close, advice.quantity)
         }
       }
 
@@ -53,16 +58,30 @@ class TradeInstance {
 
   async sell(price, quantity = 0) {
     try {
+      // If quanity is not set use Asset Balance
+      if (quantity == 0) {
+        quantity = this.asset_balance
+      }
+
       logger.info(`SYMBOL: ${this.symbol} SELL QUANTITY: ${quantity}`)
 
       if (quantity > 0) {
         let response = await this.exchangeAPI.create_limit_sell_order(this.symbol, quantity, price)
 
         if (response) {
-          await trade_util.insert_account_trades(response, this.instanceID)
+          await trade_util.insert_account_orders(response, this.instanceID)
 
-          /* TODO handle amounts correctly */
-          await trade_util.set_trade_instance_balance(this.instanceID, 0, this.quote_balance, this.asset_balance, 0)
+          /*
+          this.asset_balance 
+          this.quote_balance 
+          this.order_asset_balance 
+          this.order_quote_balance
+          */
+
+          this.asset_balance -= response.amount
+          this.order_asset_balance += response.amount
+
+          await this.sync_balance()
         }
       }
     } catch (e) {
@@ -70,23 +89,37 @@ class TradeInstance {
     }
   }
 
-  async buy(price, quantity = 0) {
+  async buy(price, quote_limit = 0) {
     try {
-      let prices = await trade_util.get_prices()
+      let quantity = 0
+
+      if (quote_limit == 0 || quote_limit > this.quote_balance) {
+        quote_limit = this.quote_balance
+      }
 
       // Calculate quantity
-      quantity = util.buy_quantity_by_symbol(this.quote_balance, this.symbol, prices)
+      quantity = util.buy_quantity_by_symbol(quote_limit, price)
       // Round quantity
 
       logger.info(`SYMBOL: ${this.symbol} BUY QUANTITY: ${quantity}`)
 
       if (quantity > 0) {
-        let response = await binance.limit_buy(this.symbol, quantity, price)
+        let response = await this.exchangeAPI.create_limit_buy_order(this.symbol, quantity, price)
 
-        if (typeof response.cummulativeQuoteQty != "undefined") {
-          await trade_util.insert_account_trades(response, this.instanceID)
+        if (response) {
+          await trade_util.insert_account_orders(response, this.instanceID)
 
-          await trade_util.set_trade_instance_balance(this.instanceID, this.asset_balance, 0, 0, this.quote_balance)
+          /*
+          this.asset_balance 
+          this.quote_balance 
+          this.order_asset_balance 
+          this.order_quote_balance
+          */
+
+          this.quote_balance -= response.amount
+          this.order_quote_balance += response.amount
+
+          await this.sync_balance()
         }
       }
     } catch (e) {
@@ -94,19 +127,15 @@ class TradeInstance {
     }
   }
 
-  async sync_balance(action, executedQty, cummulativeQuoteQty) {
+  async sync_balance() {
     try {
-      if (action == "BUY") {
-        this.asset_balance += executedQty / fee
-        this.quote_balance = 0
-      }
-
-      if (action == "SELL") {
-        this.quote_balance += cummulativeQuoteQty / fee
-        this.asset_balance = 0
-      }
-
-      await trade_util.set_trade_instance_balance(this.instanceID, this.asset_balance, this.quote_balance)
+      /*
+      this.asset_balance 
+      this.quote_balance 
+      this.order_asset_balance 
+      this.order_quote_balance
+      */
+      await trade_util.set_trade_instance_balance(this.instanceID, this.asset_balance, this.quote_balance, this.order_asset_balance, this.order_quote_balance)
     } catch (e) {
       logger.error("Trade instance sync balance error ", e)
     }
@@ -119,10 +148,13 @@ class TradeInstance {
       let order = await trade_util.get_last_trades_by_instance(this.instanceID)
 
       if (order.length != 0) {
-        let order_info = await binance.order_status(this.symbol, order[0].orderId)
+        console.log(order[0].id, order[0].symbol)
+
+        let order_info = await this.exchangeAPI.fetchOrder(order[0].id, order[0].symbol)
 
         console.log(order_info)
 
+        /*
         console.log("Order balances", this.order_asset_balance, this.order_quote_balance)
 
         // Order completed!
@@ -144,7 +176,7 @@ class TradeInstance {
           await trade_util.close_acccount_trades(order_info.orderId)
 
           await trade_util.set_trade_instance_balance(this.instanceID, this.order_asset_balance, this.order_quote_balance, 0, 0)
-        }
+        */
       }
     } catch (e) {
       logger.error("Trade instance order check error ", e)

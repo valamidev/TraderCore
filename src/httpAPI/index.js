@@ -84,9 +84,9 @@ class HttpAPI {
 
     router.get("/ordertest", async (ctx, next) => {
       await tradebot.api_update_trade_instance(11, {
-        action: "SELL",
-        quantity: 1,
-        close: 0.00035
+        action: "BUY",
+        quantity: 0,
+        close: 0.0003186
       })
 
       ctx.body = "Done"

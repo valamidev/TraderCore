@@ -6,7 +6,7 @@ const logger = require("../logger")
 
 const ccxt_controller = require("../exchange/ccxt_controller")
 
-const fee = 1.001
+// const fee = 1.001
 
 class TradeInstance {
   constructor(config) {

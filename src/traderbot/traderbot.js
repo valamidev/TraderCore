@@ -51,26 +51,26 @@ class Traderbot {
       // Only load new instances, re-load is not an option anymore
       let instances = await this.load_trade_instances_db()
 
-      let old_instances = this.trade_instances.map((elem) => elem.instanceID)
+      let old_instances = this.trade_instances.map((e) => e.instanceID)
 
-      instances = instances.filter((elem) => old_instances.indexOf(elem.guid) < 0)
+      instances = instances.filter((e) => old_instances.indexOf(e.guid) < 0)
 
-      instances.map((elem) => {
+      instances.map((e) => {
         let new_instance = new TradeInstance({
-          exchange: "binance",
-          limit_order: elem.limit_order,
-          instanceID: elem.guid,
-          strategy_guid: elem.strategy_guid,
-          symbol: elem.symbol,
-          asset: elem.asset,
-          quote: elem.quote,
-          asset_balance: elem.asset_balance,
-          quote_balance: elem.quote_balance,
-          order_asset_balance: elem.order_asset_balance,
-          order_quote_balance: elem.order_quote_balance
+          exchange: e.exchange,
+          limit_order: e.limit_order,
+          instanceID: e.guid,
+          strategy_guid: e.strategy_guid,
+          symbol: e.symbol,
+          asset: e.asset,
+          quote: e.quote,
+          asset_balance: e.asset_balance,
+          quote_balance: e.quote_balance,
+          order_asset_balance: e.order_asset_balance,
+          order_quote_balance: e.order_quote_balance
         })
 
-        logger.verbose(`Tradebot new instances loaded, guid: ${elem.strategy_guid}`)
+        logger.verbose(`Tradebot new instances loaded, guid: ${e.strategy_guid}`)
 
         this.trade_instances.push(new_instance)
       })

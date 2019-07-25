@@ -1,3 +1,4 @@
+/* eslint-disable require-atomic-updates */
 "use strict"
 const _ = require("lodash")
 const logger = require("../logger")
@@ -46,11 +47,13 @@ class HttpAPI {
 
       responses = await optimizer.execute(candledata)
 
-      ctx.body = {
+      let response = {
         post_body: post,
         test_results: _.reverse(responses),
         candledata: candledata
       }
+
+      ctx.body = response
     })
 
     router.get("/test", async (ctx, next) => {
@@ -130,22 +133,6 @@ class HttpAPI {
     router.get("/tradepairs", async (ctx, next) => {
       ctx.body = await tradepairs.load_tradepairs()
     })
-
-    /*  router.get("/status", (ctx, next) => {
-      ctx.body = tensorflow_object.status;
-    });
-
-    router.post("/predict", async (ctx, next) => {
-      try {
-        let post_data = await parse(ctx);
-
-        let input_data = utils.trade_singal_input(post_data.input, 4);
-
-        ctx.body = await tensorflow_object.api_get_predict(input_data);
-      } catch (e) {
-        ctx.throw(400, "Predict error", e);
-      }
-    });*/
 
     // Update new routes
     app.use(router.routes()).use(router.allowedMethods())

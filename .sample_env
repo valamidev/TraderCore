@@ -1,10 +1,18 @@
 # MySQL Database Config 
 #
 #
-MYSQL_HOST=localhost
-MYSQL_USER=root
-MYSQL_PASS=pass
-MYSQL_DB=stockml
+MYSQL_HOST=
+MYSQL_USER=
+MYSQL_PASS=
+MYSQL_DB=
+
+# Exchange Database
+# Storage of the Candlesticks 
+#
+MYSQL_HOST_EXCHANGE=
+MYSQL_USER_EXCHANGE=
+MYSQL_PASS_EXCHANGE=
+MYSQL_DB_EXCHANGE=
 
 # Loglevel verbose,info
 log_level = info
@@ -13,15 +21,10 @@ log_level = info
 #
 # On / Off
 traderbot = 1
-live_emulator = 0
+live_emulator = 1
 backtest_emulator = 1
-evaluator = 0
-
-#Binance
-#
-#
-BINANCE_APIKEY= 
-BINANCE_APISECRET= 
+evaluator = 1
+# account = 0 Temporary disabled
 
 
 #HTTP API

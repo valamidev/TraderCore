@@ -7,7 +7,6 @@ const Router = require("koa-router")
 const parse = require("co-body")
 const cors = require("@koa/cors")
 const Optimizer = require("../emulator/strategy_optimizer")
-const fs = require("fs")
 
 const app = new Koa()
 app.use(cors())
@@ -22,7 +21,7 @@ class HttpAPI {
       prefix: `/${name}`
     })
 
-    router.post("/masstest", async (ctx, next) => {
+    router.post("/masstest", async (ctx) => {
       let post = await parse(ctx)
 
       logger.verbose(JSON.stringify(post))
@@ -54,6 +53,8 @@ class HttpAPI {
       }
 
       ctx.body = response
+
+      return
     })
 
     router.get("/test", async (ctx, next) => {

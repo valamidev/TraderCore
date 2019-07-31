@@ -57,7 +57,7 @@ class HttpAPI {
       return
     })
 
-    router.get("/test", async (ctx, next) => {
+    router.get("/test", async (ctx) => {
       let Backtest = new BacktestEmulator({
         back_test_limit: 3000,
         file_name: "", //"backtest_data_gen.tf",
@@ -86,7 +86,7 @@ class HttpAPI {
       prefix: `/${name}`
     })
 
-    router.get("/ordertest", async (ctx, next) => {
+    router.get("/ordertest", async (ctx) => {
       await tradebot.api_update_trade_instance(11, {
         action: "SELL",
         quantity: 1,
@@ -105,7 +105,7 @@ class HttpAPI {
       prefix: `/${name}`
     })
 
-    router.get("/performance", async (ctx, next) => {
+    router.get("/performance", async (ctx) => {
       ctx.body = await live_emulator.get_performance()
     })
 
@@ -119,7 +119,7 @@ class HttpAPI {
     })
 
     // http://localhost:3001/strategies/all
-    router.get("/all", async (ctx, next) => {
+    router.get("/all", async (ctx) => {
       ctx.body = strategies
     })
 
@@ -131,7 +131,7 @@ class HttpAPI {
       prefix: `/${name}`
     })
 
-    router.get("/tradepairs", async (ctx, next) => {
+    router.get("/tradepairs", async (ctx) => {
       ctx.body = await tradepairs.load_tradepairs()
     })
 

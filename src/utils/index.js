@@ -1,6 +1,5 @@
 "use strict"
 const fs = require("fs")
-const _ = require("lodash")
 
 const util = {
   minMaxScaler: (data) => {
@@ -217,19 +216,6 @@ const util = {
     return time
   },
 
-  candlestick_name: (exchange, symbol, interval) => {
-    symbol = symbol.replace("/", "")
-
-    if (Number.isInteger(interval)) {
-      interval = util.interval_toString(interval)
-    }
-
-    let name = `${exchange}_${symbol}_${interval}`
-
-    //Lowercase only
-    return name.toLowerCase()
-  },
-
   candlestick_data_integrity: (data, invertval) => {
     let interval_msec = parseInt(invertval * 1000) //millisec
     if (data.length == 0) return false
@@ -243,6 +229,63 @@ const util = {
     }
 
     return outages
+  },
+
+  /*  StockML generic naming  */
+
+  trades_name: (exchange, symbol) => {
+    symbol = symbol.replace("/", "")
+    symbol = symbol.replace("-", "")
+    symbol = symbol.replace("_", "")
+
+    let name = `${exchange}_${symbol}_trades`
+
+    //Lowercase only
+    return name.toLowerCase()
+  },
+
+  orderbook_name: (exchange, symbol) => {
+    symbol = symbol.replace("/", "")
+    symbol = symbol.replace("-", "")
+    symbol = symbol.replace("_", "")
+
+    let name = `${exchange}_${symbol}_orderbook`
+
+    //Lowercase only
+    return name.toLowerCase()
+  },
+
+  candlestick_name: (exchange, symbol, interval) => {
+    symbol = symbol.replace("/", "")
+    symbol = symbol.replace("-", "")
+    symbol = symbol.replace("_", "")
+
+    if (Number.isInteger(interval)) {
+      interval = util.interval_toString(interval)
+    }
+
+    let name = `${exchange}_${symbol}_${interval}`
+
+    //Lowercase only
+    return name.toLowerCase()
+  },
+
+  livefeed_name: (exchange, interval) => {
+    if (Number.isInteger(interval)) {
+      interval = util.interval_toString(interval)
+    }
+
+    let name = `livefeed_${exchange}_${interval}`
+
+    //Lowercase only
+    return name.toLowerCase()
+  },
+
+  livefeed_trades: (exchange) => {
+    let name = `livefeed_${exchange}_trades`
+
+    //Lowercase only
+    return name.toLowerCase()
   }
 }
 

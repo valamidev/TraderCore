@@ -12,12 +12,18 @@ class Tradepairs {
 
   async get_candlestick(exchange, symbol, interval, limit = 0) {
     try {
-      /* TODO remove hardcoded value */
+      let rows = []
+
+      // TODO add proper support Tick Chart values
+      if ([16, 32, 64, 128, 256, 512, 1024].indexOf(interval) >= 0) {
+        rows = await this.get_tickchart(exchange, symbol, interval, limit)
+
+        return rows
+      }
+
       let exchange_base_interval = 60
 
       let table_name = util.candlestick_name(exchange, symbol, exchange_base_interval)
-
-      let rows = []
 
       // Converted Candles
       if (interval != exchange_base_interval && limit != 0) {

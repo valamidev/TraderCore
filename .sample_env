@@ -1,18 +1,31 @@
-# MySQL Database Config 
 #
+################## Appliaction Database
+#
+# low performance database
 #
 MYSQL_HOST=
 MYSQL_USER=
 MYSQL_PASS=
 MYSQL_DB=
 
-# Exchange Database
-# Storage of the Candlesticks 
+#
+################## Exchange Database
+# Storage of exhcange datas / high performance database
 #
 MYSQL_HOST_EXCHANGE=
 MYSQL_USER_EXCHANGE=
 MYSQL_PASS_EXCHANGE=
 MYSQL_DB_EXCHANGE=
+
+
+#
+################## Redis Database
+# Redis can be used to increase reliability and reduce latency between services
+#
+REDIS_HOST = 
+REDIS_PORT = 6379
+REDIS_AUTH = 
+REDIS_DB_ID = 0
 
 # Loglevel verbose,info
 log_level = info

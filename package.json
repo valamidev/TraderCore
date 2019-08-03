@@ -20,6 +20,7 @@
     "co-body": "^6.0.0",
     "dotenv": "^8.0.0",
     "eventemitter3": "^4.0.0",
+    "ioredis": "^4.14.0",
     "koa": "^2.7.0",
     "koa-router": "^7.4.0",
     "lodash": "^4.17.15",

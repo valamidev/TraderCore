@@ -1,5 +1,8 @@
 "use strict"
+
 const logger = require("./logger")
+require("./emitter")
+require("./redis")
 
 const { evaluator, live_emulator, http_api, backtest_emulator, traderbot, sentiment, account, http_port } = process.env
 
@@ -37,7 +40,7 @@ async function main() {
     }
 
     if (traderbot == 1) {
-      const exchanges = require("./exchange/ccxt_controller")
+      require("./exchange/ccxt_controller")
       const trader_bot = require("./traderbot/traderbot")
 
       await trader_bot.start()

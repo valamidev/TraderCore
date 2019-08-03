@@ -1,68 +1,62 @@
-"use strict";
-const _ = require("lodash");
-const logger = require("../logger");
-const { pool } = require("../database");
-const util = require("../utils");
-const strategies = require("../strategies/index");
-const tradepairs = require("../tradepairs/tradepairs");
+"use strict"
+const _ = require("lodash")
+const logger = require("../logger")
+const { pool } = require("../database")
+const strategies = require("../strategies/index")
+const tradepairs = require("../tradepairs/tradepairs")
 
-const Optimizer = require("../emulator/strategy_optimizer");
+const Optimizer = require("../emulator/strategy_optimizer")
 
 class Strategy_evaluator {
   constructor() {
-    this.looptime = 12 * 3600 * 1000; //Every 12 hours!
-    this.candle_limits = [400, 1000, 3000];
-    this.test_count = 50;
+    this.looptime = 12 * 3600 * 1000 //Every 12 hours!
+    this.candle_limits = [400, 1000, 3000]
+    this.test_count = 50
     // Load all strategies
-    this.strategies = strategies;
+    this.strategies = strategies
   }
 
   async start() {
     try {
-      this.update_evaluator_loop();
+      this.update_evaluator_loop()
     } catch (e) {
-      logger.error("Evaluator error ", e);
+      logger.error("Evaluator error ", e)
     }
   }
 
   async update_evaluator_loop() {
     try {
       // Check last evaluation time
-      let last_update = await this.time_check();
+      let last_update = await this.time_check()
 
       // If last update were long time ago run it gently!
       if (last_update + this.looptime < Date.now()) {
-        await this.execution();
+        await this.execution()
       }
     } catch (e) {
-      logger.error("Evaluator update error!", e);
+      logger.error("Evaluator update error!", e)
     } finally {
       setTimeout(() => {
-        this.update_evaluator_loop();
-      }, 3600 * 1000);
+        this.update_evaluator_loop()
+      }, 3600 * 1000)
     }
   }
 
   async execution() {
     try {
-      this.tradepairs = await this.load_tradepairs();
+      this.tradepairs = await this.load_tradepairs()
 
-      const time = Date.now();
+      const time = Date.now()
 
       for (let i = 0; i < this.tradepairs.length; i++) {
-        const tradepair = this.tradepairs[i];
+        const tradepair = this.tradepairs[i]
 
-        const Candledata = await tradepairs.get_candlestick(
-          tradepair.exchange,
-          tradepair.symbol,
-          tradepair.interval,
-          _.last(this.candle_limit)
-        );
+        const Candledata = await tradepairs.get_candlestick(tradepair.exchange, tradepair.symbol, tradepair.interval, _.last(this.candle_limit))
 
         for (let k = 0; k < this.candle_limits.length; k++) {
-          const limit = this.candle_limits[k];
+          const limit = this.candle_limits[k]
 
-          let candledata = _.takeRight(Candledata, limit);
+          let candledata = _.takeRight(Candledata, limit)
 
           let config = {
             time,
@@ -71,46 +65,46 @@ class Strategy_evaluator {
             interval: tradepair.interval,
             test_count: this.test_count,
             candle_limit: limit
-          };
+          }
 
-          this.evaluation(config, candledata);
+          this.evaluation(config, candledata)
         }
 
-        logger.info(`Strategy evaluation finsihed for ${tradepair.symbol}`);
+        logger.info(`Strategy evaluation finsihed for ${tradepair.symbol}`)
       }
     } catch (e) {
-      logger.error("Evaluator execution error ", e);
+      logger.error("Evaluator execution error ", e)
     }
   }
 
   async evaluation(config, candledata) {
     try {
       for (let i = 0; i < this.strategies.length; i++) {
-        const strategy = this.strategies[i].name;
+        const strategy = this.strategies[i].name
 
-        let optimizer_config = config;
+        let optimizer_config = config
 
-        optimizer_config.strategy = strategy;
+        optimizer_config.strategy = strategy
 
-        let optimizer = new Optimizer(optimizer_config);
+        let optimizer = new Optimizer(optimizer_config)
 
-        let responses = await optimizer.execute(candledata);
+        let responses = await optimizer.execute(candledata)
 
-        let result = responses[0];
+        let result = responses[0]
 
-        result.symbol = config.symbols;
-        result.exchange = config.exchange;
-        result.interval = config.interval;
-        result.strategy = strategy;
+        result.symbol = config.symbols
+        result.exchange = config.exchange
+        result.interval = config.interval
+        result.strategy = strategy
 
-        result.time = config.time;
+        result.time = config.time
 
-        await this.save_results(result);
+        await this.save_results(result)
       }
 
-      return;
+      return
     } catch (e) {
-      logger.error("Evaluation error", e);
+      logger.error("Evaluation error", e)
     }
   }
 
@@ -129,37 +123,33 @@ class Strategy_evaluator {
           JSON.stringify(response.actions),
           response.time
         ]
-      );
+      )
     } catch (e) {
-      logger.error("SQL error", e);
+      logger.error("SQL error", e)
     }
   }
 
   async time_check() {
     try {
-      let [rows] = await pool.query(
-        "SELECT time FROM `trade_strategies_evaluation` ORDER BY `trade_strategies_evaluation`.`time` DESC LIMIT 1;"
-      );
+      let [rows] = await pool.query("SELECT time FROM `trade_strategies_evaluation` ORDER BY `trade_strategies_evaluation`.`time` DESC LIMIT 1;")
 
       if (rows.length > 0) {
-        return rows[0].time;
+        return rows[0].time
       }
 
-      return 0;
+      return 0
     } catch (e) {
-      logger.error("SQL error", e);
+      logger.error("SQL error", e)
     }
   }
 
   async load_tradepairs() {
     try {
-      let [rows] = await pool.query(
-        "SELECT `symbol`,`exchange`,`interval_sec` as `interval` FROM `tradepairs`;"
-      );
+      let [rows] = await pool.query("SELECT `symbol`,`exchange`,`interval_sec` as `interval` FROM `tradepairs`;")
 
-      return rows;
+      return rows
     } catch (e) {
-      logger.error("SQL error", e);
+      logger.error("SQL error", e)
     }
   }
 
@@ -171,13 +161,13 @@ class Strategy_evaluator {
       let [rows] = await pool.query(
         "SELECT count(*),`symbol` from `trade_strategies_evaluation` WHERE `interval_sec` = 300 and `performance` > 1000 and time > ? group by `symbol`;",
         [time]
-      );
+      )
 
-      return rows;
+      return rows
     } catch (e) {
-      logger.error("SQL error", e);
+      logger.error("SQL error", e)
     }
   }
 }
 
-module.exports = new Strategy_evaluator();
+module.exports = new Strategy_evaluator()

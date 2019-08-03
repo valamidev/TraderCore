@@ -50,7 +50,10 @@ class HttpAPI {
         config.chart_type = "tickchart"
         let time_limit = Date.now() - config.candle_limit * 60 * 1000
 
-        candledata = await tradepairs.get_tickchart(config.exchange, config.symbols, config.interval, time_limit)
+        // TODO remove
+        let request_limit = 50000
+
+        candledata = await tradepairs.get_tickchart(config.exchange, config.symbols, config.interval, request_limit, time_limit)
       } else {
         config.chart_type = "candlestick"
         candledata = await tradepairs.get_candlestick(config.exchange, config.symbols, config.interval, config.candle_limit)

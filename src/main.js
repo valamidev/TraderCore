@@ -1,6 +1,5 @@
 "use strict"
 const logger = require("./logger")
-const _ = require("lodash")
 
 const { evaluator, live_emulator, http_api, backtest_emulator, traderbot, sentiment, account, http_port } = process.env
 

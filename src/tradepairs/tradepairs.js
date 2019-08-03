@@ -67,26 +67,6 @@ class Tradepairs {
     }
   }
 
-  async get_candlestick_from_trade(exchange, symbol, intverval, limit = 0, time = 0) {
-    try {
-      let table_name = util.trades_name(exchange, symbol)
-
-      let rows = []
-
-      if (limit == 0) {
-        ;[rows] = await candle_db.query("SELECT * FROM `" + table_name + "` WHERE time > ? ORDER BY `time` ASC;", [time])
-      } else {
-        ;[rows] = await candle_db.query("SELECT * FROM `" + table_name + "` WHERE time > ? ORDER BY `time` DESC LIMIT " + limit + ";", [time])
-      }
-
-      rows = candle_convert.trade_to_candle(rows, intverval)
-
-      return rows
-    } catch (e) {
-      logger.error("SQL error", e)
-    }
-  }
-
   async load_tradepairs() {
     try {
       let [rows] = await pool.query("SELECT * FROM `tradepairs`;")

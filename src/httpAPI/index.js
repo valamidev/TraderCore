@@ -28,18 +28,35 @@ class HttpAPI {
 
       let config = {}
 
-      config.strategy = post.strategy
-      config.symbols = post.symbol
+      post.chart_type = "candlestick"
+
       config.exchange = post.exchange
-      config.interval = post.interval
-      config.candle_limit = post.candle_limit
-      config.test_count = post.test_count
-      //
-      let responses = []
+      // config.chart_type = post.chart_type
+      config.symbols = post.symbol
+      config.interval = Number(post.interval)
+
+      config.strategy = post.strategy
+
+      config.candle_limit = Number(post.candle_limit)
+      config.test_count = Number(post.test_count)
       //
 
       // Backtest execute, speed up with pre-fetch candledata
-      let candledata = await tradepairs.get_candlestick(config.exchange, config.symbols, config.interval, config.candle_limit)
+      let candledata = []
+      let responses = []
+
+      /* TODO REMOVE AND MOVE THIS TO CLIENT SIDE */
+      if ([16, 32, 64, 128, 256, 512, 1024].indexOf(config.interval) >= 0) {
+        config.chart_type = "tickchart"
+        let time_limit = Date.now() - config.candle_limit * 60 * 1000
+
+        candledata = await tradepairs.get_tickchart(config.exchange, config.symbols, config.interval, time_limit)
+      } else {
+        config.chart_type = "candlestick"
+        candledata = await tradepairs.get_candlestick(config.exchange, config.symbols, config.interval, config.candle_limit)
+      }
+
+      // let candledata = await tradepairs.get_tickchart(config.exchange, config.symbols, 300)
 
       // Strategy optimizer, helper function
       let optimizer = new Optimizer(config)

@@ -14,9 +14,9 @@ test("Load all tradepairs", async () => {
 test("Load first tradepair Candlestick", async () => {
   let tradepairs = await Tradepairs.load_tradepairs()
 
-  let { exchange, symbol, interval_sec } = tradepairs[0]
+  let { exchange, symbol } = tradepairs[0]
 
-  let candlestick = await Tradepairs.get_candlestick(exchange, symbol, interval_sec, 100)
+  let candlestick = await Tradepairs.get_candlestick(exchange, symbol, 60, 100)
 
   expect(candlestick.length > 0).toBe(true)
 })

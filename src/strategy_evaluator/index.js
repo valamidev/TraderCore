@@ -14,6 +14,7 @@ class Strategy_evaluator {
     this.test_count = 50
     // Load all strategies
     this.strategies = strategies
+    this.base_interval = 60
   }
 
   async start() {
@@ -51,7 +52,7 @@ class Strategy_evaluator {
       for (let i = 0; i < this.tradepairs.length; i++) {
         const tradepair = this.tradepairs[i]
 
-        const Candledata = await tradepairs.get_candlestick(tradepair.exchange, tradepair.symbol, tradepair.interval, _.last(this.candle_limit))
+        const Candledata = await tradepairs.get_candlestick(tradepair.exchange, tradepair.symbol, this.base_interval, _.last(this.candle_limit))
 
         for (let k = 0; k < this.candle_limits.length; k++) {
           const limit = this.candle_limits[k]
@@ -62,7 +63,7 @@ class Strategy_evaluator {
             time,
             exchange: tradepair.exchange,
             symbols: tradepair.symbol,
-            interval: tradepair.interval,
+            interval: this.base_interval,
             test_count: this.test_count,
             candle_limit: limit
           }
@@ -145,7 +146,7 @@ class Strategy_evaluator {
 
   async load_tradepairs() {
     try {
-      let [rows] = await pool.query("SELECT `symbol`,`exchange`,`interval_sec` as `interval` FROM `tradepairs`;")
+      let [rows] = await pool.query("SELECT `symbol`,`exchange` FROM `tradepairs`;")
 
       return rows
     } catch (e) {

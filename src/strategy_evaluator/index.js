@@ -71,7 +71,7 @@ class Strategy_evaluator {
           this.evaluation(config, candledata)
         }
 
-        logger.info(`Strategy evaluation finsihed for ${tradepair.symbol}`)
+        logger.info(`Strategy evaluation started for ${tradepair.symbol}`)
       }
     } catch (e) {
       logger.error("Evaluator execution error ", e)

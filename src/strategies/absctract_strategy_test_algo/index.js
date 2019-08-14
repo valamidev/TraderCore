@@ -2,6 +2,7 @@
 
 const _ = require("lodash")
 const logger = require("../../logger")
+const Abstract_Strategy = require("../absctract_strategy")
 
 // Indicators
 const RSI = require("../utils/indicators/RSI")
@@ -13,15 +14,13 @@ const OHCL4 = require("../utils/indicators/OHCL4")
 const SMA = require("../utils/indicators/SMA")
 const STOPLOSS = require("../utils/indicators/STOPLOSS")
 
-class Strategy {
-  constructor(
-    config = {
-      bb_period: 21,
-      bb_up: 1.7,
-      bb_down: 1.7,
-      stop_loss_limit: 0.85
-    }
-  ) {
+// ML API
+const ml_api = require("../utils/ml_api")
+
+class Strategy extends Abstract_Strategy {
+  constructor(config = { threshold_buy: 1, threshold_sell: -1, stop_loss_limit: 0.85 }) {
+    super()
+
     // General Strategy config
     this.advice
     this.step = 0
@@ -32,24 +31,21 @@ class Strategy {
     // General Strategy config
 
     // Strategy config
-
+    this.threshold_buy = config.threshold_buy
+    this.threshold_sell = config.threshold_sell
     this.stop_loss_limit = config.stop_loss_limit
 
     this.stop_loss = new STOPLOSS(this.stop_loss_limit)
     // Strategy config
 
     // Indicators
-    this.bb = new BB({
-      TimePeriod: config.bb_period,
-      NbDevUp: config.bb_up,
-      NbDevDn: config.bb_down
-    })
+    this.bb = new BB({ TimePeriod: 21, NbDevUp: 1.7, NbDevDn: 1.7 })
     this.rsi = new RSI(21)
     this.obi = new OBI(15)
-    this.x_smma = new X_SMMA({ short: 10, long: 20 })
+    this.x_smma = new X_SMMA(10, 20)
     this.trix = new TRIX(18)
     this.ohcl4 = new OHCL4()
-    this.sma = new SMA(this.sma_length)
+    this.sma = new SMA(5)
 
     // Indicators
 
@@ -137,15 +133,17 @@ class Strategy {
     if (this.predict_on == 1) {
       let predict = await ml_api.predict(this.current_trade.buy_in, "lstm")
 
+      console.log(predict)
+
       if (predict["0"] > 0.5) {
         // Machine learning
         this.advice = "BUY"
-        this.stop_loss.updatePrice(this.BUF.candle[this.step])
+        this.stop_loss.update(this.BUF.candle[this.step])
       }
     } else {
       // No Machine learning
       this.advice = "BUY"
-      this.stop_loss.updatePrice(this.BUF.candle[this.step])
+      this.stop_loss.update(this.BUF.candle[this.step])
     }
   }
 
@@ -167,24 +165,17 @@ class Strategy {
       this.update_buffer(candledata)
 
       if (this.step > this.minimum_history) {
-        // Stop loss sell
-        if (this.advice == "BUY" && this.stop_loss.action == "stoploss") {
-          await this.SELL()
-        }
+        let signal = Math.random()
 
-        /*
-        this.BUF.bb_upper.push(this.bb.upper);
-        this.BUF.bb_lower.push(this.bb.lower);
-        this.BUF.bb_middle.push(this.bb.middle);
-*/
+        console.log("SIGNAL: ", signal)
 
-        if (this.BUF.candle_mid[this.step] < this.BUF.bb_lower[this.step] && this.advice != "BUY") {
-          // Buy
+        // Buy
+        if (signal > 0.5 && this.advice != "BUY") {
           await this.BUY()
         }
 
         // Sell
-        if (this.BUF.candle_mid[this.step] > this.BUF.bb_upper[this.step] && this.advice != "SELL") {
+        if (signal < 0.5 && this.advice != "SELL") {
           await this.SELL()
         }
       }

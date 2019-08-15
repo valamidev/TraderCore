@@ -79,14 +79,14 @@ class HttpAPI {
 
     router.get("/test", async (ctx) => {
       let Backtest = new BacktestEmulator({
-        back_test_limit: 3000,
+        back_test_limit: 1000,
         file_name: "", //"backtest_data_gen.tf",
         live_update: 0
       })
 
       const symbols = ["BTC/USDT"]
 
-      await Backtest.start(symbols, "binance", 240, "turtle")
+      await Backtest.start(symbols, "binance", 60, "bb_pure")
 
       let response = {
         actions: Backtest.actions,

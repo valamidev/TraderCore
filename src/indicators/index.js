@@ -42,7 +42,7 @@ class TA_indicators {
           break
         default:
           // ohlcv/4
-          price = candle.open + candle.close + candle.high + candle.low / 4
+          price = (candle.open + candle.close + candle.high + candle.low) / 4
           break
       }
 

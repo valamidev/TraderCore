@@ -1,8 +1,22 @@
-"use strict";
+"use strict"
 
 // Store strategies name, description and config range!
 
 const strategies = [
+  {
+    guid: 1,
+    name: "bb_pure",
+    desc: "Bband period() with stoploss",
+    config: {
+      bb_period: [21, 21, "int"],
+      bb_up: [1.4, 2.2, "float", 2],
+      bb_down: [1.4, 2.2, "float", 2],
+      stop_loss_limit: [0.95, 0.97, "float", 3]
+    }
+  }
+
+  /*
+
   {
     guid: 1,
     name: "cci_william",
@@ -85,7 +99,7 @@ const strategies = [
       donc_long: [45, 70, "int"],
       stop_loss_limit: [0.9, 0.93, "float", 3]
     }
-  }
-];
+  }*/
+]
 
-module.exports = strategies;
+module.exports = strategies

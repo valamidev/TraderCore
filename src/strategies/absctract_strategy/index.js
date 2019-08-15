@@ -2,13 +2,30 @@
 
 const _ = require("lodash")
 const logger = require("../../logger")
+const stop_loss = require("../../indicators/custom/STOPLOSS")
 const TA_indicators = require("../../indicators")
 
 class Abstract_Strategy {
   constructor() {
+    this.advice = ""
     this.BUFFER = {}
     this.TA = {}
+    this.advice
     this.step = -1
+    this.minimum_history = 100
+
+    // ML part
+    this.trade_history = []
+    this.current_trade = {
+      buy_price: 0,
+      sell_price: 0,
+      buy_in: [],
+      time_history: []
+    }
+
+    // STOP-LOSS
+    this.stop_loss_limit = 0.8 // Default we won't allow to lose more than 20%!
+    this.STOP_LOSS = new stop_loss(this.stop_loss_limit)
   }
 
   get_TA(label) {
@@ -17,6 +34,14 @@ class Abstract_Strategy {
 
   get_TA_age(label) {
     return this.TA[label].last_update
+  }
+
+  TAready() {
+    return this.step > this.minimum_history
+  }
+
+  update_STOPLOSS(price) {
+    this.STOP_LOSS.update(price)
   }
 
   update_TA(candledata, candleinterval = 60) {
@@ -75,6 +100,38 @@ class Abstract_Strategy {
     } catch (e) {
       console.log(e)
       logger.error("Abstract_Strategy ML_data_snapshot", e)
+    }
+  }
+
+  reset_current_trade() {
+    this.current_trade = {
+      buy_in: [],
+      time_history: [],
+      buy_price: 0,
+      sell_price: 0
+    }
+  }
+
+  BUY(price, amount = "all") {
+    if (this.advice == "BUY") return
+
+    // ML /* TODO add config! */
+    this.current_trade.buy_price = price
+    this.current_trade.buy_in = this.snapshot_BUFFER(15)
+
+    this.advice = "BUY"
+    this.STOP_LOSS.updatePrice(price)
+  }
+
+  SELL(price, amount = "all") {
+    if (this.advice == "SELL") return
+
+    if (this.current_trade.buy_in.length > 0) {
+      this.advice = "SELL"
+
+      this.current_trade.sell_price = price
+      this.trade_history.push(this.current_trade)
+      this.reset_current_trade()
     }
   }
 }

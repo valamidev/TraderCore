@@ -9,6 +9,4 @@ test("Abstract Strategy Test algo", () => {
   const Strategy = new Abstract_Strategy_Test_Algo()
 
   expect(typeof Strategy == "object").toBe(true)
-  expect(Array.isArray(Strategy.BUFFER.candle)).toBe(true)
-  expect(Array.isArray(Strategy.BUFFER.candle_mid)).toBe(true)
 })

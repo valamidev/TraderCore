@@ -9,20 +9,24 @@ class Abstract_Strategy {
     this.BUFFER = {}
     this.TA = {}
     this.step = -1
-
-    this.add_BUFFER("candle")
-    this.add_BUFFER("candle_mid")
   }
 
-  update_TA(candledata = [], candleinterval = 60) {
+  get_TA(label) {
+    return this.BUFFER[label][this.step]
+  }
+
+  get_TA_age(label) {
+    return this.TA[label].last_update
+  }
+
+  update_TA(candledata, candleinterval = 60) {
     try {
       // Update TA functions
       Object.keys(this.TA).map((label) => {
         if (this.TA[label].update_interval === candleinterval) {
-          this.TA[label].update(candledata)
+          this.TA[label].update(candledata, this.step)
         }
       })
-      /* TODO ADD different intervals and batching */
 
       this.update_BUFFER()
     } catch (e) {
@@ -34,8 +38,7 @@ class Abstract_Strategy {
     Object.keys(this.TA).map((label) => {
       this.BUFFER[label].push(this.TA[label].result)
     })
-
-    this.step++
+    this.step++ // SUPER IMPORTANT!!!!
   }
 
   add_TA(config) {

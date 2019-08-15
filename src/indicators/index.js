@@ -17,9 +17,12 @@ class TA_indicators {
     this.indicator = new indicator_base(this.params)
 
     this.result = -1
+    this.last_update = -1
   }
 
-  update(candle) {
+  update(candle, step) {
+    this.last_update = step
+
     // Price update
     if (this.indicator.input === "price") {
       let price = candle.open
@@ -42,6 +45,7 @@ class TA_indicators {
           price = candle.open + candle.close + candle.high + candle.low / 4
           break
       }
+
       this.indicator.update(price)
     } // Candle
     else {

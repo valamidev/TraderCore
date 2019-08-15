@@ -40,6 +40,8 @@ class BacktestEmulator {
           this.simulations[i].candledata = candledata
         }
 
+        logger.verbose(`Backtest Candledata length: ${this.simulations[i].candledata.length}`)
+
         this.simulations[i].emulator = new Emulator(this.simulations[i])
 
         // Start and load first chunk of candle data into the strategy

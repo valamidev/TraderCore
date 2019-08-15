@@ -54,7 +54,7 @@ class Strategy extends Abstract_Strategy {
         }
       }
     } catch (e) {
-      logger.error("BB Pure strategy error ", e)
+      logger.error("Strategy error ", e)
     }
   }
 }

@@ -92,8 +92,12 @@ class Abstract_Strategy {
       for (let k = frame_length; k >= 0; k--) {
         Object.keys(this.TA).map((label) => {
           if (this.TA[label].ta_name == "BB") {
-            //    snapshot.push(this.BUFFER[label][this.step - k].upper)
-            //  snapshot.push(this.BUFFER[label][this.step - k].lower)
+            snapshot.push(this.BUFFER[label][this.step - k].upper)
+            snapshot.push(this.BUFFER[label][this.step - k].lower)
+          } else if (this.TA[label].ta_name == "DONCHIAN") {
+            snapshot.push(this.BUFFER[label][this.step - k].min)
+            snapshot.push(this.BUFFER[label][this.step - k].max)
+            snapshot.push(this.BUFFER[label][this.step - k].middle)
           } else {
             snapshot.push(this.BUFFER[label][this.step - k])
           }
@@ -120,7 +124,7 @@ class Abstract_Strategy {
 
     // ML /* TODO add config! */
     this.current_trade.buy_price = price
-    this.current_trade.buy_in = this.snapshot_BUFFER(5)
+    this.current_trade.buy_in = this.snapshot_BUFFER(7)
 
     this.advice = "BUY"
     this.STOP_LOSS.updatePrice(price)

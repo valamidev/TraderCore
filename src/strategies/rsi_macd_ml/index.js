@@ -6,30 +6,25 @@ const Abstract_Strategy = require("../absctract_strategy")
 class Strategy extends Abstract_Strategy {
   constructor(
     config = {
-      bb_period: 21,
-      bb_up: 2.15,
-      bb_down: 2.15,
+      rsi_buy: 35,
+      rsi_sell: 65,
       stop_loss_limit: 0.95
     }
   ) {
     super()
+    this.stop_loss_limit = config.stop_loss_limit
+    this.rsi_buy = config.rsi_buy
+    this.rsi_sell = config.rsi_sell
+
     // General Strategy config
     this.predict_on = 0
     this.learn = 1
     // General Strategy config
 
     // TA Indicators
-    this.add_TA({
-      label: "BB",
-      update_interval: 60,
-      ta_name: "BB",
-      params: {
-        TimePeriod: config.bb_period,
-        NbDevUp: config.bb_up,
-        NbDevDn: config.bb_down
-      },
-      params2: "ohlcv/4"
-    })
+    this.add_TA({ label: "RSI", update_interval: 60, ta_name: "RSI", params: 15, params2: "" })
+    this.add_TA({ label: "MACD", update_interval: 60, ta_name: "MACD", params: { short: 12, long: 26, signal: 9 }, params2: "" })
+    this.add_TA({ label: "CCI", update_interval: 60, ta_name: "CCI", params: { constant: 0.015, history: 14 }, params2: "" })
   }
 
   async update(candle) {
@@ -44,12 +39,12 @@ class Strategy extends Abstract_Strategy {
           this.SELL()
         }
 
-        if (candle.low < this.BUFFER.BB[this.step].lower) {
+        if (this.BUFFER.RSI[this.step] < this.rsi_buy) {
           this.BUY(candle.close)
         }
 
         // Sell
-        if (candle.high > this.BUFFER.BB[this.step].upper) {
+        if (this.BUFFER.RSI[this.step] > this.rsi_sell) {
           this.SELL(candle.close)
         }
       }

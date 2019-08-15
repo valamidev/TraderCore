@@ -19,8 +19,7 @@ class Abstract_Strategy {
     this.current_trade = {
       buy_price: 0,
       sell_price: 0,
-      buy_in: [],
-      time_history: []
+      buy_in: []
     }
 
     // STOP-LOSS
@@ -92,7 +91,12 @@ class Abstract_Strategy {
 
       for (let k = frame_length; k >= 0; k--) {
         Object.keys(this.TA).map((label) => {
-          snapshot.push(this.BUFFER[label][this.step - k])
+          if (this.TA[label].ta_name == "BB") {
+            //    snapshot.push(this.BUFFER[label][this.step - k].upper)
+            //  snapshot.push(this.BUFFER[label][this.step - k].lower)
+          } else {
+            snapshot.push(this.BUFFER[label][this.step - k])
+          }
         })
       }
 
@@ -106,7 +110,6 @@ class Abstract_Strategy {
   reset_current_trade() {
     this.current_trade = {
       buy_in: [],
-      time_history: [],
       buy_price: 0,
       sell_price: 0
     }
@@ -117,7 +120,7 @@ class Abstract_Strategy {
 
     // ML /* TODO add config! */
     this.current_trade.buy_price = price
-    this.current_trade.buy_in = this.snapshot_BUFFER(15)
+    this.current_trade.buy_in = this.snapshot_BUFFER(5)
 
     this.advice = "BUY"
     this.STOP_LOSS.updatePrice(price)

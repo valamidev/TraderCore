@@ -35,13 +35,15 @@ class BacktestEmulator {
 
         // No initialized candledata
         if (candledata.length == 0) {
-          candledata = await tradepairs.get_candlestick(this.simulations[i].exchange, this.simulations[i].symbol, intervals, this.config.back_test_limit)
+          this.simulations[i].candledata = await tradepairs.get_candlestick(this.simulations[i].exchange, this.simulations[i].symbol, intervals, this.config.back_test_limit)
+        } else {
+          this.simulations[i].candledata = candledata
         }
 
         this.simulations[i].emulator = new Emulator(this.simulations[i])
 
         // Start and load first chunk of candle data into the strategy
-        promise_start.push(this.simulations[i].emulator.start(candledata))
+        promise_start.push(this.simulations[i].emulator.start(this.simulations[i].candledata))
       }
 
       await Promise.all(promise_start)

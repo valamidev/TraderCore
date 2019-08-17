@@ -16,6 +16,8 @@ class Emulator {
     */
     this.strategy = new (require("../strategies/" + this.config.strategy + "/"))(this.config.strategy_config)
 
+    this.update_intervals = this.strategy.invervals
+
     this.last_advice
     this.last_action
     this.next_action
@@ -55,27 +57,21 @@ class Emulator {
   async price_update() {}
 
   // Candledata / Orderbook update
-  async update(candledata, orderbook = []) {
+  async update(candledata, orderbook) {
     try {
       let update_tick = 0
 
-      for (let j = 0; j < candledata.length; j++) {
-        // Avoid false update
-        if (this.last_update_time >= candledata[j].time) {
-          continue
-        }
-        // If Volume 0 nothing happen skip the update
-        if (candledata[j].volume == 0) {
-          this.last_update_time = candledata[j].time
-          continue
-        }
+      let update_timesstamp = Object.keys(candledata)
+
+      for (let j = 0; j < update_timesstamp.length; j++) {
+        let timesstamp = update_timesstamp[j]
 
         // Strategy update!
-        await this.strategy.update(candledata[j])
+        await this.strategy.update(candledata[timesstamp])
         // Strategy update!
 
         if (this.next_action !== this.last_action) {
-          this.emulator_action(candledata[j], this.next_action)
+          this.emulator_action(candledata[timesstamp], this.next_action)
 
           this.last_action = this.next_action
         }
@@ -87,8 +83,8 @@ class Emulator {
         }
 
         // Set last update time avoid multiple update
-        this.last_update_time = candledata[j].time
-        this.last_update = candledata[j]
+        this.last_update_time = timesstamp
+        this.last_update = candledata[timesstamp]
         update_tick++
       }
 
@@ -104,20 +100,20 @@ class Emulator {
     const fee = 1.001 //1.001;
 
     if (action == "BUY" && this.quote_balance > 0) {
-      this.asset_balance = this.quote_balance / candledata_single.open / fee
+      this.asset_balance = this.quote_balance / candledata_single[60].open / fee
     }
 
     if (action == "SELL" && this.asset_balance > 0) {
-      this.quote_balance = (this.asset_balance * candledata_single.open) / fee
+      this.quote_balance = (this.asset_balance * candledata_single[60].open) / fee
     }
 
     // Save actions for later use
     this.action_list.push({
       symbol: this.config.symbol,
       action,
-      price: candledata_single.open,
+      price: candledata_single[60].open,
       quote_balance: this.quote_balance,
-      time: candledata_single.time
+      time: candledata_single[60].time
     })
   }
 }

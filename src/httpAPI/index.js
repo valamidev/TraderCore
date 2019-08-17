@@ -86,7 +86,7 @@ class HttpAPI {
 
       const symbols = ["BTC/USDT", "ETH/USDT", "BNB/USDT", "NEO/USDT", "ETH/BTC", "XRP/USDT", "EOS/BTC", "XMR/BTC"]
 
-      await Backtest.start(symbols, "binance", 120, "ml_train")
+      await Backtest.start(symbols, "binance", "ml_train")
 
       let response = {
         actions: Backtest.actions,

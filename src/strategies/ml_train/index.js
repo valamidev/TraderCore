@@ -4,13 +4,8 @@ const logger = require("../../logger")
 const Abstract_Strategy = require("../absctract_strategy")
 
 class Strategy extends Abstract_Strategy {
-  constructor(
-    config = {
-      stop_loss_limit: 0.95
-    }
-  ) {
+  constructor(config = {}) {
     super()
-    this.stop_loss_limit = config.stop_loss_limit
     this.rsi_buy = config.rsi_buy
     this.rsi_sell = config.rsi_sell
 
@@ -28,11 +23,10 @@ class Strategy extends Abstract_Strategy {
     this.add_TA({ label: "DONCHIAN", update_interval: 60, ta_name: "DONCHIAN", params: 20, params2: "" })
   }
 
-  async update(candle) {
+  async update(candledata) {
     try {
       // Update buffers and incidators
-      this.update_TA(candle)
-      this.update_STOPLOSS(candle.close)
+      this.update_candle(candledata)
 
       if (this.TAready()) {
         // Stop loss sell
@@ -42,12 +36,12 @@ class Strategy extends Abstract_Strategy {
 
         // Buy
         if (this.step % 11 == 0) {
-          this.BUY(candle.close)
+          this.BUY()
         }
 
         // Sell
         if (this.step % 21 == 0) {
-          this.SELL(candle.close)
+          this.SELL()
         }
       }
     } catch (e) {

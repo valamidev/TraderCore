@@ -19,12 +19,18 @@ class Tradepairs {
       const intervals_time = config.intervals_time || [exchange_base_interval]
       //const intervals_tick = config.intervals_tick || [] /* TODO Implement */
       const limit = config.limit || 0
-      let result = {}
+      let batch = {}
+      let result = new Map()
 
       let limit_candlestick = limit + parseInt((_.max(intervals_time) / exchange_base_interval) * 1.5) + 1
       let candledata = await this.get_candlestick(exchange, symbol, exchange_base_interval, limit_candlestick)
 
-      result[exchange_base_interval] = candledata
+      batch[exchange_base_interval] = candledata
+
+      batch[exchange_base_interval].map((elem) => {
+        result[elem.time] = {}
+        result[elem.time][exchange_base_interval] = elem
+      })
 
       if (intervals_time.length != 0) {
         for (let i = 0; i < intervals_time.length; i++) {
@@ -32,9 +38,14 @@ class Tradepairs {
 
           let batched_candles = candle_convert.json(candledata, exchange_base_interval, interval)
 
-          result[interval] = batched_candles
+          batch[interval] = batched_candles
+
+          batch[interval].map((elem) => {
+            result[elem.time][interval] = elem
+          })
         }
       }
+
       return result
     } catch (e) {
       logger.error("Batched Candlestick error", e)

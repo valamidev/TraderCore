@@ -2,7 +2,6 @@
 
 const _ = require("lodash")
 const logger = require("../../logger")
-const stop_loss = require("../../indicators/custom/STOPLOSS")
 const TA_indicators = require("../../indicators")
 
 class Abstract_Strategy {
@@ -26,10 +25,6 @@ class Abstract_Strategy {
       sell_price: 0,
       buy_in: []
     }
-
-    // STOP-LOSS
-    this.stop_loss_limit = 0.8 // Default we won't allow to lose more than 20%!
-    this.STOP_LOSS = new stop_loss(this.stop_loss_limit)
   }
 
   get_TA(label) {
@@ -46,10 +41,6 @@ class Abstract_Strategy {
 
   update_candle(candledata) {
     this.update_TA(candledata)
-  }
-
-  update_STOPLOSS(price) {
-    this.STOP_LOSS.update(price)
   }
 
   update_TA(candledatas) {
@@ -76,10 +67,6 @@ class Abstract_Strategy {
   }
 
   add_CandleInterval(interval) {
-    if (interval == 60) {
-      return
-    }
-
     if (this.invervals.indexOf(interval) == -1) {
       this.invervals.push(interval)
       this.candle_buffer[interval] = []
@@ -128,7 +115,6 @@ class Abstract_Strategy {
 
       return snapshot
     } catch (e) {
-      console.log(e)
       logger.error("Abstract_Strategy ML_data_snapshot", e)
     }
   }
@@ -149,7 +135,6 @@ class Abstract_Strategy {
     this.current_trade.buy_in = this.snapshot_BUFFER(7)
 
     this.advice = "BUY"
-    this.STOP_LOSS.updatePrice(price)
   }
 
   SELL(price /*, amount = "all"*/) {

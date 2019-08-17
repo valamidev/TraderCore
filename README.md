@@ -2,6 +2,9 @@
 
 This package is the main package of the StockML, it has 4 module + optional HTTP API end-point. Lets see what modules can do.
 
+**Discord Chat:**
+- Join our chat: https://discord.gg/GsAdRP8
+
 **Tradebot:**
 
 It can interact with Exchanges to execute,update,follow Orders and manage balances.

@@ -7,8 +7,39 @@ const logger = require("../logger")
 const { pool, candle_db } = require("../database")
 const candle_convert = require("candlestick-convert")
 
+const exchange_base_interval = 60
+
 class Tradepairs {
   constructor() {}
+
+  async get_batched_candlestick(config) {
+    try {
+      const exchange = config.exchange || "binance"
+      const symbol = config.symbol || "BTC/USDT"
+      const intervals_time = config.intervals_time || [exchange_base_interval]
+      //const intervals_tick = config.intervals_tick || [] /* TODO Implement */
+      const limit = config.limit || 0
+      let result = {}
+
+      let limit_candlestick = limit + parseInt((_.max(intervals_time) / exchange_base_interval) * 1.5) + 1
+      let candledata = await this.get_candlestick(exchange, symbol, exchange_base_interval, limit_candlestick)
+
+      result[exchange_base_interval] = candledata
+
+      if (intervals_time.length != 0) {
+        for (let i = 0; i < intervals_time.length; i++) {
+          const interval = intervals_time[i]
+
+          let batched_candles = candle_convert.json(candledata, exchange_base_interval, interval)
+
+          result[interval] = batched_candles
+        }
+      }
+      return result
+    } catch (e) {
+      logger.error("Batched Candlestick error", e)
+    }
+  }
 
   async get_candlestick(exchange, symbol, interval, limit = 0) {
     try {
@@ -20,8 +51,6 @@ class Tradepairs {
 
         return rows
       }
-
-      let exchange_base_interval = 60
 
       let table_name = util.candlestick_name(exchange, symbol, exchange_base_interval)
 

@@ -14,6 +14,11 @@ class Abstract_Strategy {
     this.step = -1
     this.minimum_history = 100
 
+    this.invervals = []
+    this.candle_buffer = {
+      60: []
+    }
+
     // ML part
     this.trade_history = []
     this.current_trade = {
@@ -39,17 +44,22 @@ class Abstract_Strategy {
     return this.step > this.minimum_history
   }
 
+  update_candle(candledata) {
+    this.update_TA(candledata)
+  }
+
   update_STOPLOSS(price) {
     this.STOP_LOSS.update(price)
   }
 
-  update_TA(candledata, candleinterval = 60) {
+  update_TA(candledatas) {
     try {
-      // Update TA functions
-      Object.keys(this.TA).map((label) => {
-        if (this.TA[label].update_interval === candleinterval) {
-          this.TA[label].update(candledata, this.step)
-        }
+      Object.keys(candledatas).map((interval) => {
+        Object.keys(this.TA).map((label) => {
+          if (Number(this.TA[label].update_interval) === Number(interval)) {
+            this.TA[label].update(candledatas[interval], this.step)
+          }
+        })
       })
 
       this.update_BUFFER()
@@ -65,9 +75,21 @@ class Abstract_Strategy {
     this.step++ // SUPER IMPORTANT!!!!
   }
 
+  add_CandleInterval(interval) {
+    if (interval == 60) {
+      return
+    }
+
+    if (this.invervals.indexOf(interval) == -1) {
+      this.invervals.push(interval)
+      this.candle_buffer[interval] = []
+    }
+  }
+
   add_TA(config) {
     try {
       let label = config.label
+      this.add_CandleInterval(config.update_interval)
 
       if (typeof this.BUFFER[label] == "undefined" && typeof this.TA[label] == "undefined") {
         this.TA[label] = new TA_indicators(config)
@@ -119,7 +141,7 @@ class Abstract_Strategy {
     }
   }
 
-  BUY(price, amount = "all") {
+  BUY(price /*, amount = "all"*/) {
     if (this.advice == "BUY") return
 
     // ML /* TODO add config! */
@@ -130,7 +152,7 @@ class Abstract_Strategy {
     this.STOP_LOSS.updatePrice(price)
   }
 
-  SELL(price, amount = "all") {
+  SELL(price /*, amount = "all"*/) {
     if (this.advice == "SELL") return
 
     if (this.current_trade.buy_in.length > 0) {

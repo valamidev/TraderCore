@@ -74,12 +74,12 @@ class Emulator {
 
         if (this.backtest == 1) {
           // Price update
-          this.trade_emulator.update(candledata[timesstamp][60].open)
+          this.trade_emulator.update(candledata[timesstamp][60])
         }
 
         if (this.next_action !== this.last_action) {
           if (this.backtest == 1) {
-            this.trade_emulator.action({ action: this.next_action, price: candledata[timesstamp][60].open })
+            this.trade_emulator.action({ action: this.next_action, price: candledata[timesstamp][60].open, time: candledata[timesstamp][60].time })
           }
 
           this.last_action = this.next_action

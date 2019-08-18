@@ -22,17 +22,16 @@ class TradeEmulator {
 
   async action(advice) {
     try {
-      /*
-        Advice: {
+      /*{
           action:
           price:
-        }
-        */
+          time:
+        }*/
 
       if (advice.action == "BUY") {
-        await this.buy(advice.price)
+        await this.buy(advice.price, advice.time)
       } else if (advice.action == "SELL") {
-        await this.sell(advice.price)
+        await this.sell(advice.price, advice.time)
       }
 
       return
@@ -41,7 +40,7 @@ class TradeEmulator {
     }
   }
 
-  async sell(price) {
+  async sell(price, time) {
     try {
       //  logger.info(`Trade emulator Sell ${price}`)
     } catch (e) {
@@ -49,7 +48,7 @@ class TradeEmulator {
     }
   }
 
-  async buy(price) {
+  async buy(price, time) {
     try {
       if (this.quote_balance < this.order_size) {
         //Insuficient fund
@@ -58,6 +57,7 @@ class TradeEmulator {
 
       await this.create_order({
         type: "BUY",
+        time,
         price,
         size: this.order_size,
         stop_loss_limit: this.stop_loss_limit,
@@ -82,6 +82,7 @@ class TradeEmulator {
 
       let order = {
         price: config.price,
+        time: config.time,
         quantity,
         stop_loss_price,
         trailing_price,
@@ -102,24 +103,24 @@ class TradeEmulator {
     }
   }
 
-  async update(price) {
+  async update(candle) {
     try {
-      this.price = price
+      this.price = candle.close
 
       this.orders = this.orders.map((order) => {
-        if (order.stop_loss_price >= price && order.closed == 0) {
-          this.quote_balance += (order.quantity * price) / (1 + this.fee * 2)
+        if (order.stop_loss_price >= this.price && order.closed == 0) {
+          this.quote_balance += (order.quantity * this.price) / (1 + this.fee * 2)
           this.asset_balance -= order.quantity
 
           this.order_history.push(order)
 
-          order.sold = price
-          order.closed = 1
+          order.sold = this.price
+          order.closed = candle.time
         }
 
-        if (price >= order.trailing_price && order.closed == 0) {
-          order.stop_loss_price = price - price * order.trailing_limit
-          order.trailing_price = price + price * order.trailing_limit
+        if (this.price >= order.trailing_price && order.closed == 0) {
+          order.stop_loss_price = this.price - this.price * order.trailing_limit
+          order.trailing_price = this.price + this.price * order.trailing_limit
         }
 
         return order

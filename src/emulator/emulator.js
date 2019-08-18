@@ -28,7 +28,7 @@ class Emulator {
     this.action_list = []
 
     if (typeof this.config.trader_config != "undefined") {
-      this.trade_emulator = new Trade_emulator(this.trader_config)
+      this.trade_emulator = new Trade_emulator(this.config.trader_config)
       this.backtest = 1
     }
 

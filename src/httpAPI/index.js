@@ -80,8 +80,7 @@ class HttpAPI {
     router.get("/test", async (ctx) => {
       let Backtest = new BacktestEmulator({
         back_test_limit: 30000000,
-        file_name: "ml_train.tf", //"backtest_data_gen.tf",
-        live_update: 0
+        file_name: "" //"backtest_data_gen.tf",
       })
 
       const symbols = ["BTC/USDT", "ETH/USDT", "BNB/USDT", "NEO/USDT", "ETH/BTC", "XRP/USDT", "EOS/BTC", "XMR/BTC"]
@@ -89,8 +88,8 @@ class HttpAPI {
       await Backtest.start({
         symbols,
         exchange: "binance",
-        strategy: "rsi_macd_ml",
-        trader_config: { stop_loss_limit: 0.95, trailing_limit: 0.02 }
+        strategy: "bb_pure",
+        trader_config: { stop_loss_limit: 0.98, trailing_limit: 0.02, portion_pct: 10 }
       })
 
       let response = {

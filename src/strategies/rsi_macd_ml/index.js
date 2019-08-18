@@ -16,9 +16,9 @@ class Strategy extends Abstract_Strategy {
     // General Strategy config
 
     // TA Indicators
-    this.add_TA({ label: "RSI", update_interval: 300, ta_name: "RSI", params: 15, params2: "" })
-    this.add_TA({ label: "MACD", update_interval: 60, ta_name: "MACD", params: { short: 12, long: 26, signal: 9 }, params2: "" })
-    this.add_TA({ label: "CCI", update_interval: 60, ta_name: "CCI", params: { constant: 0.015, history: 14 }, params2: "" })
+    this.add_TA({ label: "SMA_5_5min", update_interval: 300, ta_name: "SMA", params: 5, params2: "ohlc/4" })
+    this.add_TA({ label: "RSI_5", update_interval: 900, ta_name: "RSI", params: 15, params2: "" })
+    this.add_TA({ label: "RSI_60", update_interval: 3600, ta_name: "RSI", params: 15, params2: "" })
   }
 
   async update(candledata) {
@@ -29,12 +29,14 @@ class Strategy extends Abstract_Strategy {
       if (this.TAready()) {
         let candle = candledata[60]
 
-        if (this.BUFFER.RSI[this.step] < this.rsi_buy) {
+        if (
+          this.BUFFER.RSI_5[this.step] < this.rsi_buy &&
+          this.BUFFER.RSI_60[this.step] < this.rsi_buy &&
+        ) {
           this.BUY(candle.close)
         }
 
-        // Sell
-        if (this.BUFFER.RSI[this.step] > this.rsi_sell) {
+        if (this.BUFFER.RSI_5[this.step] > this.rsi_sell && this.BUFFER.RSI_60[this.step] > this.rsi_sell) {
           this.SELL(candle.close)
         }
       }

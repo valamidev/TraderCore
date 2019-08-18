@@ -1,6 +1,6 @@
 {
     "arrowParens": "always",
     "semi": false,
-    "printWidth": 200,
+    "printWidth": 180,
     "tabWidth": 2
   }

@@ -148,6 +148,12 @@ class Abstract_Strategy {
       this.reset_current_trade()
     }
   }
+
+  IDLE() {
+    if (this.advice == "IDLE") return
+
+    this.advice = "IDLE"
+  }
 }
 
 module.exports = Abstract_Strategy

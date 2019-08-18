@@ -116,6 +116,7 @@ class TradeEmulator {
 
           order.sold = this.price
           order.closed = candle.time
+          order.balance = this.full_balance()
         }
 
         if (this.price >= order.trailing_price && order.closed == 0) {

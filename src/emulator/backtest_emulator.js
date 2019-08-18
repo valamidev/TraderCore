@@ -22,8 +22,15 @@ class BacktestEmulator {
   }
 
   // Start backtest instances
-  async start(symbols, exchange, strategy, strategy_config, candledata = []) {
+  async start(config = {} /*symbols, exchange, strategy, strategy_config, trader_config, candledata = []*/) {
     try {
+      let symbols = config.symbols || ["BTC/USDT"]
+      let exchange = config.exchange || "binance"
+      let strategy = config.strategy || ""
+      let strategy_config = config.strategy_config || {}
+      let trader_config = config.trader_config || {}
+      let candledata = config.candledata || []
+
       this.simulations = await this.load_backtest(symbols, exchange)
 
       let promise_start = []
@@ -32,6 +39,7 @@ class BacktestEmulator {
         // Set strategy and config
         this.simulations[i].strategy = strategy
         this.simulations[i].strategy_config = strategy_config
+        this.simulations[i].trader_config = trader_config
 
         this.simulations[i].emulator = new Emulator(this.simulations[i])
 
@@ -62,12 +70,6 @@ class BacktestEmulator {
       await this.sync_performance()
       await this.sync_actions()
 
-      if (this.config.live_update == 1 && this.data_gen == 0) {
-        setInterval(async () => {
-          await this.update_loop()
-        }, 35000)
-      }
-
       if (this.data_gen == 1) {
         await this.save_histories()
         logger.info(`Backtest histories saved!`)
@@ -80,50 +82,12 @@ class BacktestEmulator {
   }
 
   /* Mass update on all strategy  */
-  async update_loop() {
-    try {
-      let update_loop_promises = []
-      let time = Date.now()
-
-      for (let i = 0; i < this.simulations.length; i++) {
-        update_loop_promises.push(this.single_update(i))
-      }
-
-      await Promise.all(update_loop_promises)
-
-      logger.info(`Backtest strategies updated, count: ${this.simulations.length} , time: ${time} last_candle: ${this.simulations[0].emulator.last_update.time} `)
-
-      await this.sync_performance()
-
-      return
-    } catch (e) {
-      logger.error("Backtest Emulator update loop error ", e)
-    }
-  }
-
-  /* Helper function for Update loop */
-  async single_update(strategies_id) {
-    try {
-      let guid = strategies_id
-
-      let candledata = await tradepairs.get_candlestick(this.simulations[guid].exchange, this.simulations[guid].symbol, this.simulations[guid].interval_sec, 10)
-
-      await this.simulations[guid].emulator.update(candledata)
-
-      // Save new advice otherwise Idle
-      if (this.simulations[guid].emulator.last_advice !== this.simulations[guid].last_advice) {
-        this.simulations[guid].last_advice = this.simulations[guid].emulator.last_advice
-      }
-    } catch (e) {
-      logger.error("Backtest Emulator single update error ", e)
-    }
-  }
 
   async sync_actions() {
     this.actions = []
 
     this.simulations.map((simulation) => {
-      this.actions.push(simulation.emulator.action_list)
+      this.actions.push(simulation.emulator.trade_emulator.orders)
     })
   }
 
@@ -133,7 +97,7 @@ class BacktestEmulator {
     for (let i = 0; i < this.simulations.length; i++) {
       // Set strategy
 
-      let singe_performance = [this.simulations[i].symbol, this.simulations[i].exchange, this.simulations[i].emulator.quote_balance]
+      let singe_performance = [this.simulations[i].symbol, this.simulations[i].exchange, this.simulations[i].emulator.trade_emulator.full_balance()]
 
       this.performance.push(singe_performance)
     }

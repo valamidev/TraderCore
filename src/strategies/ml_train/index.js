@@ -6,8 +6,9 @@ const Abstract_Strategy = require("../absctract_strategy")
 class Strategy extends Abstract_Strategy {
   constructor(config = {}) {
     super()
-    this.rsi_buy = config.rsi_buy
-    this.rsi_sell = config.rsi_sell
+
+    this.rsi_buy = config.rsi_buy || 30
+    this.rsi_sell = config.rsi_sell || 70
 
     // General Strategy config
     this.predict_on = 0

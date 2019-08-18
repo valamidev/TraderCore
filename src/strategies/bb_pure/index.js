@@ -4,15 +4,13 @@ const logger = require("../../logger")
 const Abstract_Strategy = require("../absctract_strategy")
 
 class Strategy extends Abstract_Strategy {
-  constructor(
-    config = {
-      bb_period: 21,
-      bb_up: 2.15,
-      bb_down: 2.15,
-      stop_loss_limit: 0.95
-    }
-  ) {
+  constructor(config = {}) {
     super()
+
+    const bb_period = config.bb_period || 21
+    const bb_up = config.bb_up || 2.15
+    const bb_down = config.bb_down || 2.15
+
     // General Strategy config
     this.predict_on = 0
     this.learn = 1
@@ -21,28 +19,24 @@ class Strategy extends Abstract_Strategy {
     // TA Indicators
     this.add_TA({
       label: "BB",
-      update_interval: 60,
+      update_interval: 1200,
       ta_name: "BB",
       params: {
-        TimePeriod: config.bb_period,
-        NbDevUp: config.bb_up,
-        NbDevDn: config.bb_down
+        TimePeriod: bb_period,
+        NbDevUp: bb_up,
+        NbDevDn: bb_down
       },
       params2: "ohlcv/4"
     })
   }
 
-  async update(candle) {
+  async update(candledata) {
     try {
       // Update buffers and incidators
-      this.update_TA(candle)
-      this.update_STOPLOSS(candle.close)
+      this.update_candle(candledata)
 
       if (this.TAready()) {
-        // Stop loss sell
-        if (this.advice == "BUY" && this.STOP_LOSS == "stoploss") {
-          this.SELL()
-        }
+        let candle = candledata[60]
 
         if (candle.low < this.BUFFER.BB[this.step].lower) {
           this.BUY(candle.close)

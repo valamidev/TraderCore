@@ -2,6 +2,7 @@
 
 const _ = require("lodash")
 const logger = require("../logger")
+const Trade_emulator = require("../traderbot/trade_emulator")
 
 class Emulator {
   constructor(config) {
@@ -14,8 +15,8 @@ class Emulator {
         strategy_config: null,
         interval: 300}
     */
-    this.strategy = new (require("../strategies/" + this.config.strategy + "/"))(this.config.strategy_config)
 
+    this.strategy = new (require("../strategies/" + this.config.strategy + "/"))(this.config.strategy_config)
     this.update_intervals = this.strategy.invervals
 
     this.last_advice
@@ -24,11 +25,12 @@ class Emulator {
     this.last_update_time = 0
 
     this.last_update = []
-
-    this.quote_balance = 1000
-    this.asset_balance = 0
-
     this.action_list = []
+
+    if (typeof this.config.trader_config != "undefined") {
+      this.trade_emulator = new Trade_emulator(this.trader_config)
+      this.backtest = 1
+    }
 
     this.state = "Loaded"
   }
@@ -70,8 +72,15 @@ class Emulator {
         await this.strategy.update(candledata[timesstamp])
         // Strategy update!
 
+        if (this.backtest == 1) {
+          // Price update
+          this.trade_emulator.update(candledata[timesstamp][60].open)
+        }
+
         if (this.next_action !== this.last_action) {
-          this.emulator_action(candledata[timesstamp], this.next_action)
+          if (this.backtest == 1) {
+            this.trade_emulator.action({ action: this.next_action, price: candledata[timesstamp][60].open })
+          }
 
           this.last_action = this.next_action
         }
@@ -94,27 +103,6 @@ class Emulator {
     } catch (e) {
       logger.error("Emulator error ", e)
     }
-  }
-
-  async emulator_action(candledata_single, action) {
-    const fee = 1.001 //1.001;
-
-    if (action == "BUY" && this.quote_balance > 0) {
-      this.asset_balance = this.quote_balance / candledata_single[60].open / fee
-    }
-
-    if (action == "SELL" && this.asset_balance > 0) {
-      this.quote_balance = (this.asset_balance * candledata_single[60].open) / fee
-    }
-
-    // Save actions for later use
-    this.action_list.push({
-      symbol: this.config.symbol,
-      action,
-      price: candledata_single[60].open,
-      quote_balance: this.quote_balance,
-      time: candledata_single[60].time
-    })
   }
 }
 

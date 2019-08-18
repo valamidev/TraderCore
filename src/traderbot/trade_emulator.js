@@ -11,9 +11,10 @@ class TradeEmulator {
     this.fee = config.fee || 0.001
     this.stop_loss_limit = config.stop_loss_limit || 0.9
     this.trailing_limit = config.trailing_limit || 0.01
-    this.portion_pct = config.portion || 10
+    this.portion_pct = config.portion_pct || 10
 
-    this.order_size = this.quote_balance / this.portion_pct
+    this.order_size = (this.quote_balance / 100) * this.portion_pct
+
     this.orders = []
     this.order_history = []
 

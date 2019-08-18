@@ -33,7 +33,7 @@ class HttpAPI {
       config.strategy = post.strategy
       config.candle_limit = Number(post.candle_limit)
       config.test_count = Number(post.test_count)
-      config.trader_config = { stop_loss_limit: 0.98, trailing_limit: 0.02, portion_pct: 10 }
+      config.trader_config = { stop_loss_limit: 0.98, trailing_limit: 0.01, portion_pct: 25 }
       let responses = []
 
       // Strategy optimizer, helper function

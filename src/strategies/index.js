@@ -10,8 +10,7 @@ const strategies = [
     config: {
       bb_period: [21, 21, "int"],
       bb_up: [1.4, 2.2, "float", 2],
-      bb_down: [1.4, 2.2, "float", 2],
-      stop_loss_limit: [0.95, 0.97, "float", 3]
+      bb_down: [1.4, 2.2, "float", 2]
     }
   },
   {
@@ -20,8 +19,7 @@ const strategies = [
     desc: "RSI / MACD",
     config: {
       rsi_buy: [0, 100, "float", 2],
-      rsi_sell: [0, 100, "float", 2],
-      stop_loss_limit: [0.95, 0.97, "float", 3]
+      rsi_sell: [0, 100, "float", 2]
     }
   }
 

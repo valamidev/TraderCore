@@ -51,7 +51,7 @@ class Optimizer {
       let responses = []
       let promises = []
       let backtest_list = []
-      let backtest_config = []
+      let backtest_strategy_config = []
       let base_config = this.load_base_config(conf.strategy)
 
       // Add ever possible intervals
@@ -68,13 +68,14 @@ class Optimizer {
         backtest_list[i] = new BacktestEmulator({ file_name: "" })
 
         // Create randomized config
-        backtest_config[i] = this.config_optimizer(base_config)
+        backtest_strategy_config[i] = this.config_optimizer(base_config)
 
         promises.push(
           backtest_list[i].start({
             symbols: conf.symbols,
             exchange: conf.exchange,
             strategy: conf.strategy,
+            strategy_config: backtest_strategy_config[i],
             trader_config: conf.trader_config,
             candledata: this.candledata
           })
@@ -87,7 +88,7 @@ class Optimizer {
         responses.push({
           strategy: conf.strategy,
           candle_limit: conf.candle_limit,
-          config: backtest_config[i],
+          config: backtest_strategy_config[i],
           actions: backtest_list[i].actions,
           performance: backtest_list[i].performance,
           num_actions: backtest_list[i].actions[0].length,

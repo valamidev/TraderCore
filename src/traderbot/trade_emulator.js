@@ -5,12 +5,11 @@ const logger = require("../logger")
 
 class TradeEmulator {
   constructor(config = {}) {
-    //   Config parse
     this.asset_balance = config.asset_balance || 0
     this.quote_balance = config.quote_balance || 1000
     this.fee = config.fee || 0.001
-    this.stop_loss_limit = config.stop_loss_limit || 0.9
-    this.trailing_limit = config.trailing_limit || 0.01
+    this.stop_loss_limit = config.stop_loss_limit || 0.9 // -1 disable
+    this.trailing_limit = config.trailing_limit || 0.01 // -1 disable
     this.portion_pct = config.portion_pct || 10
 
     this.order_size = (this.quote_balance / 100) * this.portion_pct
@@ -37,15 +36,29 @@ class TradeEmulator {
 
       return
     } catch (e) {
-      logger.error("Trade instance error ", e)
+      logger.error("Trade emulator error ", e)
     }
   }
 
   async sell(price, time) {
     try {
-      //  logger.info(`Trade emulator Sell ${price}`)
+      this.orders = this.orders.map((order) => {
+        if (order.closed == 0) {
+          this.quote_balance += (order.quantity * price) / (1 + this.fee * 2)
+          this.asset_balance -= order.quantity
+
+          this.order_history.push(order)
+
+          order.sold = price
+          order.closed = time
+          order.close_type = "Sell"
+          order.balance = this.full_balance()
+        }
+
+        return order
+      })
     } catch (e) {
-      logger.error("Trade instance error sell ", e)
+      logger.error("Trade emulator Sell error ", e)
     }
   }
 
@@ -65,7 +78,7 @@ class TradeEmulator {
         trailing_limit: this.trailing_limit
       })
     } catch (e) {
-      logger.error("Trade instance error ", e)
+      logger.error("Trade emulator Buy error ", e)
     }
   }
 
@@ -77,9 +90,18 @@ class TradeEmulator {
         quantity = util.buy_quantity_by_symbol(config.size, config.price)
       }
 
-      let stop_loss_price = config.price * config.stop_loss_limit
-      let trailing_price = config.price + config.price * config.trailing_limit * 2
-      let trailing_limit = config.trailing_limit
+      let stop_loss_price = 0
+      let trailing_price = 0
+      let trailing_limit = 0
+
+      if (config.stop_loss_limit > 0) {
+        stop_loss_price = config.price * config.stop_loss_limit
+      }
+
+      if (config.trailing_limit > 0) {
+        trailing_price = config.price + config.price * config.trailing_limit * 2
+        trailing_limit = config.trailing_limit
+      }
 
       let order = {
         price: config.price,
@@ -88,7 +110,8 @@ class TradeEmulator {
         stop_loss_price,
         trailing_price,
         trailing_limit,
-        closed: 0
+        closed: 0,
+        balance: this.full_balance()
       }
 
       this.orders.push(order)
@@ -109,7 +132,7 @@ class TradeEmulator {
       this.price = candle.close
 
       this.orders = this.orders.map((order) => {
-        if (order.stop_loss_price >= this.price && order.closed == 0) {
+        if (order.stop_loss_price > 0 && order.stop_loss_price >= this.price && order.closed == 0) {
           this.quote_balance += (order.quantity * this.price) / (1 + this.fee * 2)
           this.asset_balance -= order.quantity
 
@@ -117,10 +140,11 @@ class TradeEmulator {
 
           order.sold = this.price
           order.closed = candle.time
+          order.close_type = "Stop-loss"
           order.balance = this.full_balance()
         }
 
-        if (this.price >= order.trailing_price && order.closed == 0) {
+        if (order.trailing_limit > 0 && this.price >= order.trailing_price && order.closed == 0) {
           order.stop_loss_price = this.price - this.price * order.trailing_limit
           order.trailing_price = this.price + this.price * order.trailing_limit
         }
@@ -128,7 +152,7 @@ class TradeEmulator {
         return order
       })
     } catch (e) {
-      logger.error("Trade emulator create_order error ", e)
+      logger.error("Trade emulator update error ", e)
     }
   }
 

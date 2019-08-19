@@ -72,7 +72,8 @@ class HttpAPI {
         symbols,
         exchange: "binance",
         strategy: "bb_pure",
-        trader_config: { stop_loss_limit: 0.98, trailing_limit: 0.02, portion_pct: 10 }
+        trader_config: { stop_loss_limit: 0.98, trailing_limit: 0.02, portion_pct: 30 }
+        // trader_config: { stop_loss_limit: -1, trailing_limit: -1, portion_pct: 30 }
       })
 
       let response = {

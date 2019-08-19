@@ -29,10 +29,7 @@ class Strategy extends Abstract_Strategy {
       if (this.TAready()) {
         let candle = candledata[60]
 
-        if (
-          this.BUFFER.RSI_5[this.step] < this.rsi_buy &&
-          this.BUFFER.RSI_60[this.step] < this.rsi_buy &&
-        ) {
+        if (this.BUFFER.RSI_5[this.step] < this.rsi_buy && this.BUFFER.RSI_60[this.step] < this.rsi_buy) {
           this.BUY(candle.close)
         }
 

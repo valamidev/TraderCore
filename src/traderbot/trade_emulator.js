@@ -157,6 +157,7 @@ class TradeEmulator {
   }
 
   full_balance() {
+    this.order_size = (this.quote_balance / 100) * this.portion_pct
     return this.quote_balance + this.asset_balance * this.price
   }
 }

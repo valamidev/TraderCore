@@ -6,7 +6,7 @@ const strategies = [
   {
     guid: 1,
     name: "bb_pure",
-    desc: "Bband period() with stoploss",
+    desc: "Bband strategy",
     config: {
       bb_period: [21, 21, "int"],
       bb_up: [1.4, 2.2, "float", 2],
@@ -15,7 +15,7 @@ const strategies = [
   },
   {
     guid: 2,
-    name: "rsi_macd_ml",
+    name: "rsi_macd",
     desc: "RSI / MACD",
     config: {
       rsi_buy: [0, 100, "float", 2],

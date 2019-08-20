@@ -12,7 +12,7 @@ class Optimizer {
   }
 
   load_base_config(name) {
-    let stategy_info = strategies.filter((elem) => elem.name === name)[0]
+    let stategy_info = strategies.find((elem) => elem.name === name)
 
     return stategy_info.config
   }

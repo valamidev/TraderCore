@@ -65,7 +65,7 @@ const util = {
 
   // Binance trade round
   round_by_symbol: (amount, symbol, tradeinfo) => {
-    let stepsize = tradeinfo.filter((elem) => elem.symbol == symbol)[0].stepsize
+    let stepsize = tradeinfo.find((elem) => elem.symbol == symbol).stepsize
 
     let power_val = 1
 

@@ -1,21 +1,23 @@
 #
-################## Appliaction Database
+################## Application Database
 #
 # low performance database
 #
 MYSQL_HOST=
+MYSQL_PORT=3306
 MYSQL_USER=
 MYSQL_PASS=
-MYSQL_DB=
+MYSQL_DB=stockml
 
 #
 ################## Exchange Database
-# Storage of exhcange datas / high performance database
+# Storage of exchange datas / high performance database
 #
 MYSQL_HOST_EXCHANGE=
+MYSQL_PORT_EXCHANGE=3306
 MYSQL_USER_EXCHANGE=
 MYSQL_PASS_EXCHANGE=
-MYSQL_DB_EXCHANGE=
+MYSQL_DB_EXCHANGE=stockml_exchange
 
 
 #
@@ -27,19 +29,18 @@ REDIS_PORT = 6379
 REDIS_AUTH = 
 REDIS_DB_ID = 0
 
-# Loglevel verbose,info
+# Log Level verbose,info
 log_level = info
 
 # Application settings
 #
 # On / Off
 traderbot = 1
-live_emulator = 1
-backtest_emulator = 1
+liveEmulator = 1
+backtestEmulator = 1
 evaluator = 1
-# account = 0 Temporary disabled
 
 
 #HTTP API
-http_api = 1
-http_port = 3001
+httpAPI = 1
+httpPort = 3001

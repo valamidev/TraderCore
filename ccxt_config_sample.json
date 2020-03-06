@@ -1,0 +1,10 @@
+{
+"binance" :{
+    "apiKey": "",
+    "secret": ""
+},
+"kucoin" :{
+    "apiKey": "",
+    "secret": ""
+}
+}

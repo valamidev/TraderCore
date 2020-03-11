@@ -80,5 +80,9 @@ package-lock.json
 
 # Tensorflow train datas
 *.tf
-ccxt_config.json
+ccxtConfig.json
 .docker_scripts
+.next
+table_creator.js
+ccxtConfig.json
+build

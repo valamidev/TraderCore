@@ -1,6 +1,4 @@
-"use strict"
-
-class TA_indicators {
+class TAIndicators {
   /* 
     label = @string unique name to indentify in the strategy
     update_interval = @number Candlestick/Tickchart update interval 60,120,180,300
@@ -9,51 +7,51 @@ class TA_indicators {
     params2 = @Optional parametes like O,H,L,C,V values for price update 
   */
 
-  constructor(config = { label: "label", update_interval: 60, ta_name: "ema", params: {}, params2: "ohlcv/4" }) {
-    Object.assign(this, config)
+  constructor(config = { label: 'label', update_interval: 60, ta_name: 'ema', params: {}, params2: 'ohlcv/4' }) {
+    Object.assign(this, config);
 
-    const indicator_base = require(`./custom/${this.ta_name}`)
+    const indicator_base = require(`./custom/${this.ta_name}`);
 
-    this.indicator = new indicator_base(this.params)
+    this.indicator = new indicator_base(this.params);
 
-    this.result = -1
-    this.last_update = -1
+    this.result = -1;
+    this.lastUpdate = -1;
   }
 
   update(candle, step) {
-    this.last_update = step
+    this.lastUpdate = step;
 
     // Price update
-    if (this.indicator.input === "price") {
-      let price = candle.open
+    if (this.indicator.input === 'price') {
+      let price = candle.open;
 
       switch (this.params2) {
-        case "open":
-          price = candle.open
-          break
-        case "close":
-          price = candle.close
-          break
-        case "high":
-          price = candle.high
-          break
-        case "low":
-          price = candle.low
-          break
+        case 'open':
+          price = candle.open;
+          break;
+        case 'close':
+          price = candle.close;
+          break;
+        case 'high':
+          price = candle.high;
+          break;
+        case 'low':
+          price = candle.low;
+          break;
         default:
           // ohlcv/4
-          price = (candle.open + candle.close + candle.high + candle.low) / 4
-          break
+          price = (candle.open + candle.close + candle.high + candle.low) / 4;
+          break;
       }
 
-      this.indicator.update(price)
+      this.indicator.update(price);
     } // Candle
     else {
-      this.indicator.update(candle)
+      this.indicator.update(candle);
     }
-    this.result = this.indicator.result
-    return this.result
+    this.result = this.indicator.result;
+    return this.result;
   }
 }
 
-module.exports = TA_indicators
+module.exports = TAIndicators;

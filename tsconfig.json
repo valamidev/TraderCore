@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "target": "es2017",
+    "newLine": "lf",
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "build",
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "allowJs": true,
+    "strict": true,
+    "pretty": true,
+    "removeComments": true,
+    "typeRoots": ["./node_modules/@types", "./types"]
+  },
+  "include": ["src", "types"],
+  "exclude": ["node_modules", "src/__test__"]
+}

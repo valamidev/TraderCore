@@ -1,10 +1,7 @@
 # TraderCore
 
-This package is the main package of the StockML, it has 4 module + optional HTTP API end-point. Lets see what modules can do.
-
-**Discord Chat:**
-
-- Join our chat: https://discord.gg/GsAdRP8
+This application made for DataSynchronizer (https://github.com/stockmlbot/DataSynchronizer/) to utilize and process the collected exchange datas and provide various endpoints.
+#
 
 **Tradebot:**
 
@@ -12,27 +9,26 @@ It can interact with Exchanges to execute,update,follow Orders and manage balanc
 
 **Live emulator:**
 
-It allow to load/update your pre configured strategies, it can give advices to Tradebot.
+It allow to load/update your pre-configured strategies, it can give advices to Tradebot.
 
 **Backtest emulator:**
 
 This reffer to execute backtest, monte-carlo analysis (auto optimize strategies), this can be CPU intense.
 
-**Evaluator:**
+**HTTP API:**
 
-It is an automatisation for Backtest emulator, it can run every 12hour (default settings) and check every strategi on every tradePairs. This can be very much CPU intense.
+Every module has HTTP API end-point.
 
-**+1 HTTP API:**
 
-Every module has HTTP API end-point for manual controlling.
-
+#
 **Install:**
+- Edit configuration files
 
 ```
-npm install
+npm install && npm run build && npm start
 ```
 
-Windows(Only):
+Windows(only):
 
 - Talib will build only with `--vs2015` build tools.
 
@@ -40,4 +36,4 @@ Windows(Only):
 npm install --vs2015 --global windows-build-tools
 ```
 
-Edit \_sample configuration files
+

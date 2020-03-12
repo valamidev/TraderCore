@@ -52,7 +52,7 @@ export class StrategyOptimizer {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async execute(): Promise<any> {
     try {
-      const responses = [];
+      const result = [];
       const promises: Array<Promise<void>> = [];
       const backtestEmulatorList = [];
       const backtestStrategyConfig = [];
@@ -82,20 +82,17 @@ export class StrategyOptimizer {
 
       await Promise.all(promises);
 
-      for (let i = 0; i < this.config.numberOfExecution; i++) {
-        responses.push({
+      for (const backtestEmulator of backtestEmulatorList) {
+        result.push({
           strategy: this.config.strategy,
-          config: backtestStrategyConfig[i],
-          actions: backtestEmulatorList[i].actions,
-          performance: backtestEmulatorList[i].performance,
-          numActions: backtestEmulatorList[i]?.actions[0]?.length,
-          // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-          // @ts-ignore
-          sumPerformance: _.sumBy(backtestEmulatorList[i].performance, 2),
+          config: backtestEmulator?.config?.strategyConfig ?? {},
+          historyOrders: backtestEmulator.historyOrders,
+          performance: backtestEmulator.performance,
+          numOfOrders: backtestEmulator?.historyOrders.length,
         });
       }
 
-      return _.orderBy(responses, ['sumPerformance']);
+      return _.orderBy(result, ['sumPerformance']);
     } catch (e) {
       logger.error('Strategy StrategyOptimizer error ', e);
     }

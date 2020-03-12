@@ -20,7 +20,7 @@ describe('BackTest Emulator', () => {
     });
 
     // Assert
-    expect(Backtest.actions).toHaveLength(0);
+    expect(Backtest.historyOrders).toHaveLength(0);
     expect(Backtest).toHaveProperty('performance', 1000);
   });
 });

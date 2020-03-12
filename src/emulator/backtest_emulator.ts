@@ -7,19 +7,21 @@ import { DEFAULT_BACKTEST_ARRAY_LIMIT } from '../constants';
 export class BacktestEmulator {
   simulation?: Simulation;
   performance: number;
-  actions: any[];
+  historyOrders: any[];
   backTestArrayLimit: number;
+  config?: BacktestEmulatorInit;
 
   constructor(backTestArrayLimit?: number) {
     this.backTestArrayLimit = backTestArrayLimit ?? DEFAULT_BACKTEST_ARRAY_LIMIT;
 
     this.performance = 0;
-    this.actions = [];
+    this.historyOrders = [];
   }
 
   // Start backtest instances
   async start(config: BacktestEmulatorInit): Promise<void> {
     try {
+      this.config = config;
       const symbol = config.symbol; // 'BTC/USDT';
       const exchange = config.exchange; // 'binance';
       const strategy = config.strategy; // 'bb_pure';
@@ -47,7 +49,7 @@ export class BacktestEmulator {
 
       logger.verbose(`Backtest emulator loaded successfully, Strategy: ${strategy}, Candledata length: ${candledata.size}`);
 
-      this.actions = this.simulation.emulator.TradeEmulator?.orders ?? [];
+      this.historyOrders = this.simulation.emulator.TradeEmulator?.historyOrders ?? [];
 
       this.performance = this.simulation.emulator.TradeEmulator?.getFullBalance() || 0;
 

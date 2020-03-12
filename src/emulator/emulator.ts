@@ -22,9 +22,9 @@ export class Emulator {
 
   constructor(config: EmulatorConfig) {
     this.config = config;
+    this.intervals = this.config.intervals;
 
     this.strategy = new (require('../strategies/' + this.config.strategy + '/'))(this.config.strategyConfig);
-    this.intervals = this.strategy.intervals;
 
     this.lastAdvice;
     this.lastAction;

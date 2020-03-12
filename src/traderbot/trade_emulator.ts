@@ -52,21 +52,23 @@ export class TradeEmulator {
 
   sell(price: number, time: number): void {
     try {
-      this.orders = this.orders.map(order => {
-        if (order.closed == 0) {
-          this.balanceQuote += (order.quantity * price) / (1 + this.fee * 2);
-          this.balanceAsset -= order.quantity;
+      this.orders = this.orders
+        .map(order => {
+          if (order.closed === 0) {
+            this.balanceQuote += (order.quantity * price) / (1 + this.fee * 2);
+            this.balanceAsset -= order.quantity;
 
-          this.historyOrders.push(order);
+            order.sold = price;
+            order.closed = time;
+            order.closeType = 'Sell';
+            order.balance = this.getFullBalance();
 
-          order.sold = price;
-          order.closed = time;
-          order.closeType = 'Sell';
-          order.balance = this.getFullBalance();
-        }
+            this.historyOrders.push(order);
+          }
 
-        return;
-      });
+          return order;
+        })
+        .filter(order => order.closed === 0);
     } catch (e) {
       logger.error('Trade emulator Sell error ', e);
     }
@@ -125,7 +127,9 @@ export class TradeEmulator {
         balance: this.getFullBalance(),
       };
 
-      this.orders.push(order);
+      if (order) {
+        this.orders.push(order);
+      }
 
       if (config.type == 'BUY') {
         this.balanceQuote -= config.size;
@@ -143,24 +147,26 @@ export class TradeEmulator {
       this.price = candle.close;
 
       this.orders = this.orders.map(order => {
-        if (order.stopLossPrice > 0 && order.stopLossPrice >= this.price && order.closed == 0) {
-          this.balanceQuote += (order.quantity * this.price) / (1 + this.fee * 2);
-          this.balanceAsset -= order.quantity;
+        if (order) {
+          if (order?.stopLossPrice > 0 && order?.stopLossPrice >= this.price && order?.closed == 0) {
+            this.balanceQuote += (order.quantity * this.price) / (1 + this.fee * 2);
+            this.balanceAsset -= order.quantity;
 
-          this.historyOrders.push(order);
+            this.historyOrders.push(order);
 
-          order.sold = this.price;
-          order.closed = candle.time;
-          order.closeType = 'Stop-loss';
-          order.balance = this.getFullBalance();
+            order.sold = this.price;
+            order.closed = candle.time;
+            order.closeType = 'Stop-loss';
+            order.balance = this.getFullBalance();
+          }
+
+          if (order?.trailingLimit > 0 && this.price >= order?.trailingPrice && order?.closed == 0) {
+            order.stopLossPrice = this.price - this.price * order.trailingLimit;
+            order.trailingPrice = this.price + this.price * order.trailingLimit;
+          }
+
+          return order;
         }
-
-        if (order.trailingLimit > 0 && this.price >= order.trailingPrice && order.closed == 0) {
-          order.stopLossPrice = this.price - this.price * order.trailingLimit;
-          order.trailingPrice = this.price + this.price * order.trailingLimit;
-        }
-
-        return order;
       });
 
       return;

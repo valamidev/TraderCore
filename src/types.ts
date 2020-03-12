@@ -110,7 +110,6 @@ export interface TradeInstanceConfig {
 }
 
 export interface StrategyConfig {
-  intervals: number[];
   readonly [key: string]: unknown;
 }
 

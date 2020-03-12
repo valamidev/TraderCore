@@ -68,15 +68,15 @@ class HttpAPI {
       try {
         const Backtest = new BacktestEmulator();
 
-        const candledata = await tradePairs.getBatchedCandlestickMap('binance', 'BTC/USDT', [60, 300], 3000);
+        const candledata = await tradePairs.getBatchedCandlestickMap('binance', 'BTC/USDT', [60, 300, 1200], 3000);
 
         if (candledata) {
           await Backtest.start({
             exchange: 'binance',
             symbol: 'BTC/USDT',
             strategy: 'bb_pure',
-            strategyConfig: { intervals: [60, 300] },
-            intervals: [60, 300],
+            strategyConfig: {},
+            intervals: [60, 300, 1200],
             traderConfig: { stopLossLimit: 0.98, trailingLimit: 0.02, portionPct: 30, balanceAsset: 0, balanceQuote: 1000, fee: 0.002 },
             candledata,
             // traderConfig: { stopLossLimit: -1, trailingLimit: -1, portionPct: 30 }

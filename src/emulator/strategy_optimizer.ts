@@ -3,11 +3,11 @@ import { logger } from '../logger';
 import tradePairs from '../tradepairs/tradepairs';
 import { BacktestEmulator } from './backtest_emulator';
 import strategies from '../strategies/index';
-import { StrategyOptimizerConfig, OHLCVMap } from '../types';
+import { StrategyOptimizerConfig, batchedOHLCV } from '../types';
 import { DEFAULT_STRATEGY_OPTIMIZER_INTERVALS } from '../constants';
 
 export class StrategyOptimizer {
-  candledata: OHLCVMap;
+  candledata: batchedOHLCV;
   config: StrategyOptimizerConfig;
   constructor(config: StrategyOptimizerConfig) {
     this.config = config;
@@ -67,7 +67,7 @@ export class StrategyOptimizer {
       // Load default intervals
       const intervals = DEFAULT_STRATEGY_OPTIMIZER_INTERVALS;
 
-      this.candledata = (await tradePairs.getBatchedCandlestickMap(this.config.exchange, this.config.symbol, intervals, this.config.candleLimit)) as OHLCVMap;
+      this.candledata = (await tradePairs.getBatchedCandlestickMap(this.config.exchange, this.config.symbol, intervals, this.config.candleLimit)) as batchedOHLCV;
 
       for (let i = 0; i < this.config.numberOfExecution; i++) {
         backtestEmulatorList[i] = new BacktestEmulator();
@@ -83,6 +83,7 @@ export class StrategyOptimizer {
             strategyConfig: backtestStrategyConfig[i],
             traderConfig: this.config.traderConfig,
             candledata: this.candledata,
+            intervals,
           }),
         );
       }

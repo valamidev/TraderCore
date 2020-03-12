@@ -9,6 +9,7 @@ import cors from '@koa/cors';
 //import { StrategyOptimizer } from '../emulator/strategy_optimizer';
 import tradePairs from '../tradepairs/tradepairs';
 import { BacktestEmulator } from '../emulator/backtest_emulator';
+import { DEFAULT_TRADER_CONFIG } from 'src/constants';
 
 const app = new Koa();
 app.use(cors());
@@ -77,7 +78,7 @@ class HttpAPI {
             strategy: 'bb_pure',
             strategyConfig: {},
             intervals: [60, 300, 1200],
-            traderConfig: { stopLossLimit: 0.98, trailingLimit: 0.02, portionPct: 30, balanceAsset: 0, balanceQuote: 1000, fee: 0.002 },
+            traderConfig: DEFAULT_TRADER_CONFIG,
             candledata,
             // traderConfig: { stopLossLimit: -1, trailingLimit: -1, portionPct: 30 }
           });

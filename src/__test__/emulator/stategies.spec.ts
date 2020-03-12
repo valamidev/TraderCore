@@ -1,5 +1,5 @@
 import { AbstractStrategy } from '../../strategies/abstract_strategy';
-import { getBatchedCandlestickMap } from '../utils/candlestick_generator';
+import { fakeBatchedCandlestickMap } from '../utils/candlestick_generator';
 // const baseIntervals = [60];
 
 describe.only('Strategy', () => {
@@ -7,7 +7,7 @@ describe.only('Strategy', () => {
 
   it.only('should after Start update the properties ', async () => {
     // Arrange
-    const candleData = getBatchedCandlestickMap([60, 300], 1000);
+    const candleData = fakeBatchedCandlestickMap([60, 300], 1000);
     const updateTimeStamps = Object.keys(candleData);
 
     strategy = new AbstractStrategy();

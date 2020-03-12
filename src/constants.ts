@@ -6,6 +6,8 @@ export const DEFAULT_LIVE_STRATEGY_HOT_START_CANDLE_SIZE = 3000;
 
 export const DEFAULT_TRADERBOT_UPDATELOOP_TIMEOUT = 10 * 1000;
 
+export const DEFAULT_TRADER_CONFIG = { stopLossLimit: 0.98, trailingLimit: 0.02, portionPct: 50, balanceAsset: 0, balanceQuote: 1000, fee: 0.002 };
+
 export enum EmulatorStates {
   LOADED = 'Loaded',
   READY = 'Ready',

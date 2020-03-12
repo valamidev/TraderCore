@@ -2,6 +2,7 @@ import { BacktestEmulator } from '../../emulator/backtest_emulator';
 import { batchedOHLCV } from '../../types';
 
 import candleData from '../fixtures/candleData';
+import { DEFAULT_TRADER_CONFIG } from '../../constants';
 
 const Backtest = new BacktestEmulator();
 
@@ -14,7 +15,7 @@ describe('BackTest Emulator', () => {
       strategy: 'bb_pure',
       strategyConfig: { intervals: [60, 300] },
       intervals: [60, 300],
-      traderConfig: { stopLossLimit: 0.98, trailingLimit: 0.02, portionPct: 30, balanceAsset: 0, balanceQuote: 1000, fee: 0.002 },
+      traderConfig: DEFAULT_TRADER_CONFIG,
       candledata: (candleData as any) as batchedOHLCV,
     });
 

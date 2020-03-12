@@ -1,20 +1,14 @@
 import _ from 'lodash';
 import { logger } from '../logger';
-import tradePairs from '../tradepairs/tradepairs';
 import { BacktestEmulator } from './backtest_emulator';
 import strategies from '../strategies/index';
 import { StrategyOptimizerConfig, batchedOHLCV } from '../types';
 import { DEFAULT_STRATEGY_OPTIMIZER_INTERVALS } from '../constants';
 
 export class StrategyOptimizer {
-  candledata: batchedOHLCV;
-  config: StrategyOptimizerConfig;
-  constructor(config: StrategyOptimizerConfig) {
-    this.config = config;
-    this.candledata = new Map();
-  }
+  constructor(public config: StrategyOptimizerConfig) {}
 
-  loadStrategyConfigSchema(name: string): unknown | undefined {
+  private _loadStrategyConfigSchema(name: string): unknown | undefined {
     const strategyInfo = strategies.find(elem => elem.name === name);
 
     if (strategyInfo?.config) {
@@ -25,7 +19,7 @@ export class StrategyOptimizer {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  strategyConfigRandomizer(config: any): any {
+  private _strategyConfigRandomizer(config: any): any {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const newConfig: any = {};
 
@@ -62,18 +56,16 @@ export class StrategyOptimizer {
       const promises: Array<Promise<void>> = [];
       const backtestEmulatorList = [];
       const backtestStrategyConfig = [];
-      const baseStrategyConfig = this.loadStrategyConfigSchema(this.config.strategy);
+      const baseStrategyConfig = this._loadStrategyConfigSchema(this.config.strategy);
 
       // Load default intervals
       const intervals = DEFAULT_STRATEGY_OPTIMIZER_INTERVALS;
-
-      this.candledata = (await tradePairs.getBatchedCandlestickMap(this.config.exchange, this.config.symbol, intervals, this.config.candleLimit)) as batchedOHLCV;
 
       for (let i = 0; i < this.config.numberOfExecution; i++) {
         backtestEmulatorList[i] = new BacktestEmulator();
 
         // Create randomized config
-        backtestStrategyConfig[i] = this.strategyConfigRandomizer(baseStrategyConfig);
+        backtestStrategyConfig[i] = this._strategyConfigRandomizer(baseStrategyConfig);
 
         promises.push(
           backtestEmulatorList[i].start({
@@ -82,7 +74,7 @@ export class StrategyOptimizer {
             strategy: this.config.strategy,
             strategyConfig: backtestStrategyConfig[i],
             traderConfig: this.config.traderConfig,
-            candledata: this.candledata,
+            candledata: this.config.candledata,
             intervals,
           }),
         );
@@ -93,11 +85,10 @@ export class StrategyOptimizer {
       for (let i = 0; i < this.config.numberOfExecution; i++) {
         responses.push({
           strategy: this.config.strategy,
-          candleLimit: this.config.candleLimit,
           config: backtestStrategyConfig[i],
           actions: backtestEmulatorList[i].actions,
           performance: backtestEmulatorList[i].performance,
-          numActions: backtestEmulatorList[i].actions[0].length,
+          numActions: backtestEmulatorList[i]?.actions[0]?.length,
           // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
           // @ts-ignore
           sumPerformance: _.sumBy(backtestEmulatorList[i].performance, 2),

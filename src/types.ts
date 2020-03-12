@@ -78,12 +78,12 @@ export interface LiveSimulation {
 }
 
 export interface StrategyOptimizerConfig {
-  numberOfExecution: number;
-  candleLimit: number;
-  symbol: string;
   exchange: string;
+  symbol: string;
+  numberOfExecution: number;
   strategy: string;
   traderConfig: TradeEmulatorConfig;
+  candledata: batchedOHLCV;
 }
 
 export interface TradeEmulatorConfig {

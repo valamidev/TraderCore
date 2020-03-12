@@ -5,7 +5,7 @@ import { EXCHANGE_BASE_INTERVAL_IN_SEC } from '../../constants';
 const timeStep = 60 * 1000;
 const defaultTime = 1583925360000;
 
-export const getBatchedCandlestickMap = (intervalsTimeInSec: number[], limit: number): batchedOHLCV => {
+export const fakeBatchedCandlestickMap = (intervalsTimeInSec: number[], limit: number): batchedOHLCV => {
   const limitCandlestick = ~~(limit + ((Math.max(...intervalsTimeInSec) as number) / EXCHANGE_BASE_INTERVAL_IN_SEC) * 1.5);
 
   const batch = {};

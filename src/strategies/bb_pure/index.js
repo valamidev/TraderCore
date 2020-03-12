@@ -1,5 +1,5 @@
 const logger = require('../../logger');
-const AbstractStrategy = require('../abstract_strategy');
+const { AbstractStrategy } = require('../abstract_strategy');
 
 class Strategy extends AbstractStrategy {
   constructor(config = {}) {
@@ -17,8 +17,8 @@ class Strategy extends AbstractStrategy {
     // TA Indicators
     this.addNeWTA({
       label: 'BB',
-      update_interval: 1200,
-      ta_name: 'BB',
+      updateInterval: 1200,
+      nameTA: 'BB',
       params: {
         TimePeriod: bb_period,
         NbDevUp: bb_up,
@@ -30,7 +30,7 @@ class Strategy extends AbstractStrategy {
 
   async update(candledata) {
     try {
-      // Update buffers and incidators
+      // Update buffers and indicators
       this.updateWithCandle(candledata);
 
       if (this.isStrategyReady()) {

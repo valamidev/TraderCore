@@ -1,7 +1,7 @@
 import { logger } from '../../logger';
 import TAIndicators from '../../indicators';
 import { OHLCV } from 'candlestick-convert';
-import { OHLCVMap } from '../../types';
+import { OHLCVMap, configTA } from '../../types';
 
 export class AbstractStrategy {
   intervals: number[];
@@ -34,11 +34,11 @@ export class AbstractStrategy {
     };
   }
 
-  getTaValueByLabel(label: string): any {
+  getTAValueByLabel(label: string): any {
     return this.TA_BUFFER[label][this.step];
   }
 
-  getTaAgeByLabel(label: string): any {
+  getTAAgeByLabel(label: string): any {
     return this.TA[label].lastUpdate;
   }
 
@@ -71,7 +71,7 @@ export class AbstractStrategy {
     try {
       Object.keys(candledata).forEach(interval => {
         Object.keys(this.TA).forEach(label => {
-          if (Number(this.TA[label].update_interval) === Number(interval)) {
+          if (Number(this.TA[label].updateInterval) === Number(interval)) {
             this.TA[label].update(candledata[interval], this.step);
           }
         });
@@ -102,10 +102,10 @@ export class AbstractStrategy {
     }
   }
 
-  addNeWTA(config: any): void {
+  addNeWTA(config: configTA): void {
     try {
       const label = config.label;
-      this.addNewCandleInterval(config.update_interval);
+      this.addNewCandleInterval(config.updateInterval);
 
       if (typeof this.TA_BUFFER[label] == 'undefined' && typeof this.TA[label] == 'undefined') {
         this.TA[label] = new TAIndicators(config);
@@ -131,10 +131,10 @@ export class AbstractStrategy {
 
       for (let k = snapshotLength; k >= 0; k--) {
         Object.keys(this.TA).forEach(label => {
-          if (this.TA[label].ta_name == 'BB') {
+          if (this.TA[label].nameTA == 'BB') {
             snapshot.push(this.TA_BUFFER[label][this.step - k].upper);
             snapshot.push(this.TA_BUFFER[label][this.step - k].lower);
-          } else if (this.TA[label].ta_name == 'DONCHIAN') {
+          } else if (this.TA[label].nameTA == 'DONCHIAN') {
             snapshot.push(this.TA_BUFFER[label][this.step - k].min);
             snapshot.push(this.TA_BUFFER[label][this.step - k].max);
             snapshot.push(this.TA_BUFFER[label][this.step - k].middle);
@@ -186,5 +186,3 @@ export class AbstractStrategy {
     this.advice = 'IDLE';
   }
 }
-
-module.exports = AbstractStrategy;

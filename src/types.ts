@@ -117,3 +117,12 @@ export interface StrategyConfig {
 export interface TraderConfig {
   readonly [key: string]: unknown;
 }
+
+export type configTA = {
+  label: string;
+  updateInterval: number;
+  nameTA: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  params: any;
+  params2: string;
+};

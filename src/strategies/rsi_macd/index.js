@@ -1,5 +1,5 @@
 const logger = require('../../logger');
-const AbstractStrategy = require('../absctract_strategy');
+const { AbstractStrategy } = require('../abstract_strategy');
 
 class Strategy extends AbstractStrategy {
   constructor(config = {}) {
@@ -14,9 +14,9 @@ class Strategy extends AbstractStrategy {
     // General Strategy config
 
     // TA Indicators
-    this.addNeWTA({ label: 'SMA_5_5min', update_interval: 300, ta_name: 'SMA', params: 5, params2: 'ohlc/4' });
-    this.addNeWTA({ label: 'RSI_5', update_interval: 900, ta_name: 'RSI', params: 15, params2: '' });
-    this.addNeWTA({ label: 'RSI_60', update_interval: 3600, ta_name: 'RSI', params: 15, params2: '' });
+    this.addNeWTA({ label: 'SMA_5_5min', updateInterval: 300, nameTA: 'SMA', params: 5, params2: 'ohlc/4' });
+    this.addNeWTA({ label: 'RSI_5', updateInterval: 900, nameTA: 'RSI', params: 15, params2: '' });
+    this.addNeWTA({ label: 'RSI_60', updateInterval: 3600, nameTA: 'RSI', params: 15, params2: '' });
   }
 
   async update(candledata) {

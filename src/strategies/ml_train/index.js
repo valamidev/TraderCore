@@ -1,5 +1,5 @@
 const logger = require('../../logger');
-const AbstractStrategy = require('../absctract_strategy');
+const { AbstractStrategy } = require('../abstract_strategy');
 
 class Strategy extends AbstractStrategy {
   constructor(config = {}) {
@@ -14,12 +14,12 @@ class Strategy extends AbstractStrategy {
     // General Strategy config
 
     // TA Indicators
-    this.addNeWTA({ label: 'RSI', update_interval: 60, ta_name: 'RSI', params: 15, params2: '' });
-    this.addNeWTA({ label: 'MACD', update_interval: 60, ta_name: 'MACD', params: { short: 12, long: 26, signal: 9 }, params2: '' });
-    this.addNeWTA({ label: 'CCI', update_interval: 60, ta_name: 'CCI', params: { constant: 0.015, history: 14 }, params2: '' });
-    this.addNeWTA({ label: 'CROSS_SMMA', update_interval: 60, ta_name: 'CROSS_SMMA', params: { short: 8, long: 13 }, params2: '' });
-    this.addNeWTA({ label: 'MOME', update_interval: 60, ta_name: 'MOME', params: 100, params2: '' });
-    this.addNeWTA({ label: 'DONCHIAN', update_interval: 60, ta_name: 'DONCHIAN', params: 20, params2: '' });
+    this.addNeWTA({ label: 'RSI', updateInterval: 60, nameTA: 'RSI', params: 15, params2: '' });
+    this.addNeWTA({ label: 'MACD', updateInterval: 60, nameTA: 'MACD', params: { short: 12, long: 26, signal: 9 }, params2: '' });
+    this.addNeWTA({ label: 'CCI', updateInterval: 60, nameTA: 'CCI', params: { constant: 0.015, history: 14 }, params2: '' });
+    this.addNeWTA({ label: 'CROSS_SMMA', updateInterval: 60, nameTA: 'CROSS_SMMA', params: { short: 8, long: 13 }, params2: '' });
+    this.addNeWTA({ label: 'MOME', updateInterval: 60, nameTA: 'MOME', params: 100, params2: '' });
+    this.addNeWTA({ label: 'DONCHIAN', updateInterval: 60, nameTA: 'DONCHIAN', params: 20, params2: '' });
   }
 
   async update(candledata) {

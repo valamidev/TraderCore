@@ -1,16 +1,16 @@
 class TAIndicators {
   /* 
     label = @string unique name to indentify in the strategy
-    update_interval = @number Candlestick/Tickchart update interval 60,120,180,300
-    ta_name = @string Name of the TA script or Talib or Tulipb
+    updateInterval = @number Candlestick/Tickchart update interval 60,120,180,300
+    nameTA = @string Name of the TA script or Talib or Tulipb
     params = @number/object Required parameters
     params2 = @Optional parametes like O,H,L,C,V values for price update 
   */
 
-  constructor(config = { label: 'label', update_interval: 60, ta_name: 'ema', params: {}, params2: 'ohlcv/4' }) {
+  constructor(config = { label: 'label', updateInterval: 60, nameTA: 'ema', params: {}, params2: 'ohlcv/4' }) {
     Object.assign(this, config);
 
-    const indicator_base = require(`./custom/${this.ta_name}`);
+    const indicator_base = require(`./custom/${this.nameTA}`);
 
     this.indicator = new indicator_base(this.params);
 

@@ -9,7 +9,7 @@ import cors from '@koa/cors';
 //import { StrategyOptimizer } from '../emulator/strategy_optimizer';
 import tradePairs from '../tradepairs/tradepairs';
 import { BacktestEmulator } from '../emulator/backtest_emulator';
-import { DEFAULT_TRADER_CONFIG } from 'src/constants';
+import { DEFAULT_TRADER_CONFIG } from '../constants';
 
 const app = new Koa();
 app.use(cors());
@@ -84,7 +84,7 @@ class HttpAPI {
           });
 
           const response = {
-            actions: Backtest.actions,
+            historyOrders: Backtest.historyOrders,
             performance: Backtest.performance,
             // sumPerformance: _.sumBy(Backtest.performance, 2),
           };

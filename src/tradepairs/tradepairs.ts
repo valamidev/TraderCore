@@ -110,7 +110,7 @@ class TradePairs {
 
   public async loadAvailableTradePairs(): Promise<RowDataPacket[] | undefined> {
     try {
-      const [rows] = await BaseDB.query('SELECT * FROM `tradePairs`;');
+      const [rows] = await BaseDB.query('SELECT * FROM `tradepairs`;');
 
       return rows as RowDataPacket[];
     } catch (e) {

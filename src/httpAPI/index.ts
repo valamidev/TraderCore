@@ -4,12 +4,12 @@ import _ from 'lodash';
 import { logger } from '../logger';
 import Koa from 'koa';
 import Router from 'koa-router';
-//import parse from 'co-body';
+import parse from 'co-body';
 import cors from '@koa/cors';
-//import { StrategyOptimizer } from '../emulator/strategy_optimizer';
+import { StrategyOptimizer } from '../emulator/strategy_optimizer';
 import tradePairs from '../tradepairs/tradepairs';
 import { BacktestEmulator } from '../emulator/backtest_emulator';
-import { DEFAULT_TRADER_CONFIG } from '../constants';
+import { DEFAULT_TRADER_CONFIG, DEFAULT_STRATEGY_OPTIMIZER_INTERVALS } from '../constants';
 
 const app = new Koa();
 app.use(cors());
@@ -25,45 +25,66 @@ class HttpAPI {
       prefix: `/${name}`,
     });
 
-    /*
     router.post('/masstest', async ctx => {
-      const post = await parse(ctx);
+      try {
+        const post = await parse(ctx);
 
-      logger.verbose(JSON.stringify(post));
+        logger.verbose(JSON.stringify(post));
 
-      const config = {};
+        /*
+      symbol: "BTC/USDT"
+      exchange: "binance"
+      candle_limit: 1000
+      numberOfExecution: 100
+      strategy: "bb_pure"
+      config: {}
+            */
+        const config: any = {};
 
-      config.exchange = post.exchange;
-      config.symbols = post.symbol;
-      config.strategy = post.strategy;
-      config.candleLimit = Number(post.candleLimit);
-      config.test_count = Number(post.test_count);
-      config.traderConfig = { stopLossLimit: 0.97, trailingLimit: 0.02, portionPct: 20 };
-      let responses = [];
+        config.exchange = post.exchange ?? 'binance';
+        config.symbol = post.symbol ?? 'BTC/USDT';
+        config.strategy = post.strategy ?? 'bb_pure';
+        config.candleLimit = Number(post.candleLimit) || 1000;
+        config.numberOfExecution = Number(post.numberOfExecution) || 10;
 
-      // Strategy optimizer, helper function
-      let optimizer = new StrategyOptimizer(config);
+        const candleData = await tradePairs.getBatchedCandlestickMap(config.exchange as string, config.symbol as string, DEFAULT_STRATEGY_OPTIMIZER_INTERVALS, 3000);
 
-      responses = await optimizer.execute();
+        if (candleData) {
+          // Strategy optimizer, helper function
+          const optimizer = new StrategyOptimizer({
+            exchange: config.exchange as string,
+            symbol: config.symbol as string,
+            numberOfExecution: config.numberOfExecution,
+            strategy: config.strategy,
+            traderConfig: DEFAULT_TRADER_CONFIG,
+            candledata: candleData,
+          });
 
-      let candledata = [];
+          const optimizerResult = await optimizer.execute();
 
-      Object.keys(optimizer.candledata).map(time => {
-        if (optimizer.candledata[time][300]) {
-          candledata.push(optimizer.candledata[time][300]);
+          const candleDataForChart = Object.keys(candleData)
+            .map(time => {
+              if (candleData[time][300]) {
+                return candleData[time][300];
+              }
+            })
+            .filter(elem => elem !== undefined);
+
+          const response = {
+            // eslint-disable-next-line @typescript-eslint/camelcase
+            post_body: post,
+            // eslint-disable-next-line @typescript-eslint/camelcase
+            test_results: _.reverse(optimizerResult),
+            candledata: candleDataForChart,
+          };
+
+          ctx.body = response;
         }
-      });
-
-      let response = {
-        post_body: post,
-        test_results: _.reverse(responses),
-        candledata,
-      };
-
-      ctx.body = response;
-
-      return;
-    }); */
+        return;
+      } catch (err) {
+        logger.error(`HTTP API Error`);
+      }
+    });
 
     router.get('/test', async ctx => {
       try {
@@ -92,7 +113,7 @@ class HttpAPI {
           ctx.body = response;
         }
       } catch (err) {
-        logger.error(``);
+        logger.error(`HTTP API Error`);
       }
     });
 
@@ -111,8 +132,9 @@ class HttpAPI {
     // Update new routes
     app.use(router.routes()).use(router.allowedMethods());
   }
-
-  add_strategyAPI(name, strategies) {
+*/
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  httpStrategyAPI(name: string, strategies: any): void {
     const router = new Router({
       prefix: `/${name}`,
     });
@@ -125,7 +147,8 @@ class HttpAPI {
     app.use(router.routes()).use(router.allowedMethods());
   }
 
-  add_candlechartAPI(name, tradePairs) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  httpTradePairsAPI(name: string, tradePairs: any): void {
     const router = new Router({
       prefix: `/${name}`,
     });
@@ -137,7 +160,6 @@ class HttpAPI {
     // Update new routes
     app.use(router.routes()).use(router.allowedMethods());
   }
-  */
 }
 
 module.exports = HttpAPI;

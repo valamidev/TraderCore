@@ -92,7 +92,7 @@ export class StrategyOptimizer {
         });
       }
 
-      return _.orderBy(result, ['sumPerformance']);
+      return _.orderBy(result, ['performance']);
     } catch (e) {
       logger.error('Strategy StrategyOptimizer error ', e);
     }

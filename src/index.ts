@@ -5,11 +5,10 @@ require('./redis');
 require('./exchange/ccxt_controller');
 
 import { logger } from './logger';
-// import tradePairs from './tradepairs/tradepairs';
+import tradePairs from './tradepairs/tradepairs';
 import liveEmulator from './emulator/live_emulator';
-// import { BacktestEmulator } from './emulator/backtest_emulator';
 import Traderbot from './traderbot/traderbot';
-// import strategies from './strategies';
+import strategies from './strategies';
 
 const { httpPort } = process.env;
 
@@ -24,10 +23,9 @@ async function main(): Promise<void> {
     await Traderbot.start();
 
     // Load HTTP handlers
-    //  httpAPIHandler.add_live_strategyAPI('live', liveEmulator);
     httpAPIHandler.httpBacktestHandler('backtest');
-    // httpAPIHandler.add_candlechartAPI('candle', tradePairs);
-    // httpAPIHandler.add_strategyAPI('strategies', strategies);
+    httpAPIHandler.httpTradePairsAPI('candle', tradePairs);
+    httpAPIHandler.httpStrategyAPI('strategies', strategies);
 
     logger.info('Trader Bot Service started!');
   } catch (err) {

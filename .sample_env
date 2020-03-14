@@ -38,7 +38,6 @@ log_level = info
 traderbot = 1
 liveEmulator = 1
 backtestEmulator = 1
-evaluator = 1
 
 
 #HTTP API

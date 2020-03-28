@@ -1,4 +1,5 @@
 # TraderCore
+[![DeepScan grade](https://deepscan.io/api/teams/6761/projects/8874/branches/145556/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=6761&pid=8874&bid=145556)
 
 This application made for DataSynchronizer (https://github.com/stockmlbot/DataSynchronizer/) to utilize and process the collected exchange datas and provide various endpoints.
 #

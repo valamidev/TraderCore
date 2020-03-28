@@ -12,7 +12,9 @@ import strategies from './strategies';
 
 const { httpPort } = process.env;
 
-const httpAPIHandler = new (require('./httpAPI'))(httpPort ?? 3000);
+import { HTTPServer } from './httpAPI/server';
+
+const httpServer = new HTTPServer(Number(httpPort ?? 3000));
 
 async function main(): Promise<void> {
   try {
@@ -23,9 +25,9 @@ async function main(): Promise<void> {
     await Traderbot.start();
 
     // Load HTTP handlers
-    httpAPIHandler.httpBacktestHandler('backtest');
-    httpAPIHandler.httpTradePairsAPI('candle', tradePairs);
-    httpAPIHandler.httpStrategyAPI('strategies', strategies);
+    httpServer.httpBacktestHandler('backtest');
+    httpServer.httpTradePairsAPI('candle', tradePairs);
+    httpServer.httpStrategyAPI('strategies', strategies);
 
     logger.info('Trader Bot Service started!');
   } catch (err) {

@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { logger } from '../logger';
 import { BacktestEmulator } from './backtest_emulator';
 import strategies from '../strategies/index';
-import { StrategyOptimizerConfig, batchedOHLCV } from '../types';
+import { StrategyOptimizerConfig } from '../types';
 import { DEFAULT_STRATEGY_OPTIMIZER_INTERVALS } from '../constants';
 
 export class StrategyOptimizer {
@@ -86,9 +86,9 @@ export class StrategyOptimizer {
         result.push({
           strategy: this.config.strategy,
           config: backtestEmulator?.config?.strategyConfig ?? {},
-          historyOrders: backtestEmulator.historyOrders,
-          performance: backtestEmulator.performance,
-          numOfOrders: backtestEmulator?.historyOrders.length,
+          historyOrders: backtestEmulator?.historyOrders ?? [],
+          performance: backtestEmulator?.performance ?? 0,
+          numOfOrders: backtestEmulator?.historyOrders.length ?? 0,
         });
       }
 

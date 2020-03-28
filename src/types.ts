@@ -73,7 +73,7 @@ export interface LiveSimulation {
   strategy: string;
   strategyConfig: StrategyConfig;
   intervals: number[];
-  emulator?: Emulator;
+  emulator: Emulator;
   [key: string]: unknown;
 }
 

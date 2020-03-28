@@ -14,7 +14,7 @@ import { DEFAULT_TRADER_CONFIG, DEFAULT_STRATEGY_OPTIMIZER_INTERVALS } from '../
 const app = new Koa();
 app.use(cors());
 
-class HttpAPI {
+export class HTTPServer {
   constructor(port: number) {
     app.listen(port);
   }
@@ -161,5 +161,3 @@ class HttpAPI {
     app.use(router.routes()).use(router.allowedMethods());
   }
 }
-
-module.exports = HttpAPI;

@@ -23,28 +23,24 @@ class TAIndicators {
 
     // Price update
     if (this.indicator.input === 'price') {
-      let price = candle.open;
-
       switch (this.params2) {
         case 'open':
-          price = candle.open;
+          this.indicator.update(candle.open);
           break;
         case 'close':
-          price = candle.close;
+          this.indicator.update(candle.close);
           break;
         case 'high':
-          price = candle.high;
+          this.indicator.update(candle.high);
           break;
         case 'low':
-          price = candle.low;
+          this.indicator.update(candle.low);
           break;
         default:
           // ohlcv/4
-          price = (candle.open + candle.close + candle.high + candle.low) / 4;
+          this.indicator.update((candle.open + candle.close + candle.high + candle.low) / 4);
           break;
       }
-
-      this.indicator.update(price);
     } // Candle
     else {
       this.indicator.update(candle);

@@ -78,34 +78,31 @@ export const Utils = {
   /*  StockML generic naming  */
 
   tradesName: (exchange: string, symbol: string): string => {
-    symbol = symbol.replace('/', '');
-    symbol = symbol.replace('-', '');
-    symbol = symbol.replace('_', '');
+    const cleanSymbol = symbol.replace('/', '').replace('-', '').replace('_', '');
 
-    return `${exchange}_${symbol}_trades`.toLowerCase();
+    const name = `${exchange}_${cleanSymbol}_trades`;
+
+    // Lowercase only
+    return name.toLowerCase();
   },
 
   orderbookName: (exchange: string, symbol: string): string => {
-    symbol = symbol.replace('/', '');
-    symbol = symbol.replace('-', '');
-    symbol = symbol.replace('_', '');
+    const cleanSymbol = symbol.replace('/', '').replace('-', '').replace('_', '');
 
-    const name = `${exchange}_${symbol}_orderbook`;
+    const name = `${exchange}_${cleanSymbol}_orderbook`;
 
-    //Lowercase only
+    // Lowercase only
     return name.toLowerCase();
   },
 
   candlestickName: (exchange: string, symbol: string, interval: string | number): string => {
-    symbol = symbol.replace('/', '');
-    symbol = symbol.replace('-', '');
-    symbol = symbol.replace('_', '');
+    const cleanSymbol = symbol.replace('/', '').replace('-', '').replace('_', '');
 
-    if (isNaN(interval as number)) {
-      return `${exchange}_${symbol}_${Utils.intervalToString(interval as number)}`.toLowerCase();
+    if (typeof interval === 'number') {
+      return `${exchange}_${cleanSymbol}_${Utils.intervalToString(interval)}`.toLowerCase();
     }
 
-    //Lowercase only
-    return `${exchange}_${symbol}_${interval}`.toLowerCase();
+    // Lowercase only
+    return `${exchange}_${cleanSymbol}_${interval}`.toLowerCase();
   },
 };

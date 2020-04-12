@@ -12,7 +12,7 @@
     "airbnb-typescript",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
-    "prettier"
+    "plugin:prettier/recommended"
   ],
   "rules": {
     "no-console": "error",
@@ -20,6 +20,7 @@
     "import/prefer-default-export": "off",
     "import/no-default-export": "off",
     "no-bitwise": "off",
+    "no-plusplus": "off",
     "import/no-cycle": "off",
     "no-underscore-dangle": "off",
     "consistent-return": "off",
@@ -28,6 +29,14 @@
     "no-return-assign": "warn",
     "class-methods-use-this": "off",
     "import/no-dynamic-require": "off",
-    "global-require": "off"
+    "global-require": "off",
+    "lines-between-class-members": "off",
+    "array-element-newline": ["error", "consistent"],
+    "array-bracket-newline": ["error", "consistent"]
+  },
+  "settings": {
+    "react": {
+      "version": "999.999.999"
+    }
   }
 }

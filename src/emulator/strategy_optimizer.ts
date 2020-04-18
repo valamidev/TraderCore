@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { logger } from '../logger';
 import { BacktestEmulator } from './backtest_emulator';
-import strategies from '../strategies/index';
+import { STRATEGIES } from '../strategies/index';
 import { StrategyOptimizerConfig } from '../types';
 import { DEFAULT_STRATEGY_OPTIMIZER_INTERVALS } from '../constants';
 
@@ -9,13 +9,12 @@ export class StrategyOptimizer {
   constructor(public config: StrategyOptimizerConfig) {}
 
   private _loadStrategyConfigSchema(name: string): unknown | undefined {
-    const strategyInfo = strategies.find(elem => elem.name === name);
+    const strategyInfo = STRATEGIES.find(elem => elem.name === name);
 
     if (strategyInfo?.config) {
       return strategyInfo.config;
-    } else {
-      throw new Error(`Strategy config schema not exist, for strategy: ${name} `);
     }
+    throw new Error(`Strategy config schema not exist, for strategy: ${name} `);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -42,8 +41,6 @@ export class StrategyOptimizer {
       }
 
       newConfig[elem[0]] = value;
-
-      return;
     });
 
     return newConfig;

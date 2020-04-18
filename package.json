@@ -26,6 +26,7 @@
     "@koa/cors": "^2.2.3",
     "@nestjs/common": "^7.0.6",
     "@nestjs/core": "^7.0.6",
+    "@nestjs/platform-express": "^7.0.8",
     "@types/koa__cors": "^3.0.1",
     "axios": ">=0.19.0",
     "bfx-hf-indicators": "^1.0.2",

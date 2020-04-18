@@ -127,9 +127,7 @@ export class TradeEmulator {
         balance: this.getFullBalance(),
       };
 
-      if (order) {
-        this.orders.push(order);
-      }
+      this.orders.push(order);
 
       if (config.type == 'BUY') {
         this.balanceQuote -= config.size;
@@ -147,8 +145,8 @@ export class TradeEmulator {
       this.price = candle.close;
 
       this.orders = this.orders.map(order => {
-        if (order) {
-          if (order?.stopLossPrice > 0 && order?.stopLossPrice >= this.price && order?.closed == 0) {
+        if (order !== undefined) {
+          if (order?.stopLossPrice > 0 && order.stopLossPrice >= this.price && order.closed && order.closed == 0) {
             this.balanceQuote += (order.quantity * this.price) / (1 + this.fee * 2);
             this.balanceAsset -= order.quantity;
 
@@ -160,7 +158,7 @@ export class TradeEmulator {
             order.balance = this.getFullBalance();
           }
 
-          if (order?.trailingLimit > 0 && this.price >= order?.trailingPrice && order?.closed == 0) {
+          if (order?.trailingLimit > 0 && this.price >= order?.trailingPrice && order.closed && order.closed == 0) {
             order.stopLossPrice = this.price - this.price * order.trailingLimit;
             order.trailingPrice = this.price + this.price * order.trailingLimit;
           }

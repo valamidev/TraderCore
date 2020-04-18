@@ -192,8 +192,8 @@ class LiveEmulator {
           simulation.symbol,
           simulation.exchange,
           action,
-          simulation?.emulator?.lastUpdateTime || 0,
-          simulation?.emulator?.lastUpdate?.['60']?.close || 0,
+          simulation.emulator.lastUpdateTime ?? 0,
+          simulation.emulator.lastUpdate?.['60'].close ?? 0,
         ],
       );
 

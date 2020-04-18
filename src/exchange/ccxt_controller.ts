@@ -1,6 +1,6 @@
-import { logger } from '../logger';
 import _ from 'lodash';
 import * as ccxt from 'ccxt';
+import { logger } from '../logger';
 
 import * as ccxtConfig from '../../ccxt_config.json';
 
@@ -11,43 +11,48 @@ class ExchangeAPI {
   }
 
   /* CCXT API STUFF */
+  _isExchangeLoaded(exchange: string): boolean {
+    const exchangeName = exchange.toLowerCase();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (this.exchanges.find(e => e.exchangeName === exchangeName)) {
+      return true;
+    }
+
+    return false;
+  }
+
   loadExchangeAPI(exchange: string): any {
     try {
-      exchange = exchange.toLowerCase();
+      const exchangeName = exchange.toLowerCase();
 
       // Check if CCXT API already loaded
-      let exchangeData = this.exchanges.find(e => e.exchange == exchange);
+      const exchangeData = this.exchanges.find(e => e.exchangeName === exchangeName);
 
-      // CCTX API load from buffer or add to the buffer
-      if (!exchangeData) {
-        exchangeData = this.initNewExchanges(exchange);
+      if (exchangeData?.api) {
+        return exchangeData.api;
       }
 
-      return exchangeData.api;
+      return this.initNewExchanges(exchangeName).api;
     } catch (e) {
       logger.error('CCXT load API error ', e);
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initNewExchanges(exchange: string): any {
-    exchange = exchange.toLowerCase();
+    const exchangeName = exchange.toLowerCase();
 
     const config = ccxtConfig[exchange];
 
-    // Check exchange is valid
-    if (_.isObject(ccxt[exchange]) && _.isObject(config)) {
-      // Create new exchange with config
-      const api = new ccxt[exchange](config);
+    if (_.isObject(ccxt[exchangeName]) && _.isObject(config)) {
+      const api = new ccxt[exchangeName](config);
 
-      this.exchanges.push({ exchange, api });
+      if (!this._isExchangeLoaded(exchange)) {
+        this.exchanges.push({ exchangeName, api });
+      }
 
-      return { exchange, api };
-    } else {
-      throw new Error(`Invalid Exchange ${exchange}`);
+      return { exchangeName, api };
     }
+    throw new Error(`Invalid Exchange ${exchangeName}`);
   }
 
   /* CCXT API STUFF */

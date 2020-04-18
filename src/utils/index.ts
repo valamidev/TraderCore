@@ -11,7 +11,7 @@ export const Utils = {
   },
 
   round: (value: number, decimals = 2): number => {
-    const coeff = Math.pow(10, decimals);
+    const coeff = 10 ** decimals;
 
     return Math.round(value * coeff) / coeff;
   },
@@ -78,7 +78,10 @@ export const Utils = {
   /*  StockML generic naming  */
 
   tradesName: (exchange: string, symbol: string): string => {
-    const cleanSymbol = symbol.replace('/', '').replace('-', '').replace('_', '');
+    const cleanSymbol = symbol
+      .replace('/', '')
+      .replace('-', '')
+      .replace('_', '');
 
     const name = `${exchange}_${cleanSymbol}_trades`;
 
@@ -87,7 +90,10 @@ export const Utils = {
   },
 
   orderbookName: (exchange: string, symbol: string): string => {
-    const cleanSymbol = symbol.replace('/', '').replace('-', '').replace('_', '');
+    const cleanSymbol = symbol
+      .replace('/', '')
+      .replace('-', '')
+      .replace('_', '');
 
     const name = `${exchange}_${cleanSymbol}_orderbook`;
 
@@ -96,7 +102,10 @@ export const Utils = {
   },
 
   candlestickName: (exchange: string, symbol: string, interval: string | number): string => {
-    const cleanSymbol = symbol.replace('/', '').replace('-', '').replace('_', '');
+    const cleanSymbol = symbol
+      .replace('/', '')
+      .replace('-', '')
+      .replace('_', '');
 
     if (typeof interval === 'number') {
       return `${exchange}_${cleanSymbol}_${Utils.intervalToString(interval)}`.toLowerCase();

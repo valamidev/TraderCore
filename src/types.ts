@@ -1,5 +1,5 @@
-import { Emulator } from './emulator/emulator';
 import { OHLCV } from 'candlestick-convert';
+import { Emulator } from './emulator/emulator';
 
 export type batchedOHLCV = Map<string, OHLCVMapFlat>;
 

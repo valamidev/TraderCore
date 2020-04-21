@@ -6,7 +6,7 @@ TradeCore made for Trading, Signaling and Backtesting Strategies based on datas 
 
 ### Install:
 
-Rename .sample_env -> .env and configure required variables
+Rename `.sample_env` -> `.env` and configure required variables
 
 ```
 npm install && npm run build && npm start

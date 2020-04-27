@@ -42,4 +42,4 @@ backtestEmulator = 1
 
 #HTTP API
 httpAPI = 1
-httpPort = 3001
+httpPort = 3100

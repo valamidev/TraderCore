@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 import { logger } from '../logger';
 
 import { Emulator } from './emulator';
@@ -47,7 +48,9 @@ export class BacktestEmulator {
       // Start and load first chunk of candle datas into the strategy
       await this.simulation.emulator.start(candledata);
 
-      logger.verbose(`Backtest emulator loaded successfully, Strategy: ${strategy}, Candledata length: ${candledata.size}`);
+      logger.verbose(
+        `Backtest emulator loaded successfully, Strategy: ${strategy}, Candledata length: ${candledata.size}`,
+      );
 
       this.historyOrders = this.simulation.emulator.TradeEmulator?.historyOrders ?? [];
 

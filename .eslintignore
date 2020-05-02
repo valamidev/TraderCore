@@ -6,3 +6,4 @@ SQL
 *__test__
 *indicators
 strategies
+jest.config.js

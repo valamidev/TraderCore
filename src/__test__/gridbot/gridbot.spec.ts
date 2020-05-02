@@ -30,11 +30,6 @@ const perfectUpTrendChart = [
   [7, 10500, 10500, 10500, 10500, 100],
   [8, 10500, 10500, 10500, 10500, 100],
   [9, 11000, 11000, 11000, 11000, 100],
-  [10, 11000, 11000, 11000, 11000, 100],
-  [11, 11000, 11000, 11000, 11000, 100],
-  [12, 11000, 11000, 11000, 11000, 100],
-  [13, 12000, 12000, 12000, 12000, 100],
-  [14, 12000, 12000, 12000, 12000, 100],
 ];
 
 describe.skip('#Gridbot', () => {
@@ -84,12 +79,13 @@ describe.only('#Perfect Gridbot', () => {
       gridBot.exchange.cancelOrder(order.orderId);
     });
 
-    //console.log(ExchangeOrders);
+    const ExchangeBalance = gridBot.exchange.getBalance();
 
-    //console.log(gridBot.exchange.getBalance());
+    gridBot.grids.forEach(grid => {
+      expect(grid.ownedQuantity).toBe(0);
+      expect(grid.activeOrderId).toBeGreaterThan(1);
+    });
 
-    expect(1).toBe(1);
-    //expect(gridBot.grids[0].maxQuantity).toBe(ExchangeOrders[0].origQty);
-    //  expect(gridBot.grids[1].maxQuantity).toBe(ExchangeOrders[1].origQty);
+    expect(ExchangeBalance).toMatchObject({ balanceAsset: 0, balanceQuote: 1059.874949438876 });
   });
 });

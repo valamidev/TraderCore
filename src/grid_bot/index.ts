@@ -113,7 +113,7 @@ export class GridBot {
       const { priceLow, priceHigh, ownedQuantity, maxQuantity, activeOrderId } = grid;
 
       // Buy
-      if (currentPrice > priceLow && activeOrderId === null && ownedQuantity === 0) {
+      if (currentPrice >= priceLow && activeOrderId === null && ownedQuantity === 0) {
         const requiredQuantity = maxQuantity;
         const orderInfo = this.exchange.createNewOrder({
           side: OrderSide.BUY,
@@ -126,7 +126,7 @@ export class GridBot {
       }
 
       // Sell
-      if (currentPrice < priceHigh && activeOrderId === null && ownedQuantity !== 0) {
+      if (currentPrice <= priceHigh && activeOrderId === null && ownedQuantity !== 0) {
         const orderInfo = this.exchange.createNewOrder({
           side: OrderSide.SELL,
           type: OrderType.LIMIT,

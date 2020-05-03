@@ -32,7 +32,49 @@ const perfectUpTrendChart = [
   [9, 11000, 11000, 11000, 11000, 100],
 ];
 
-describe.skip('#Gridbot', () => {
+const perfectDownTrendChart = [
+  [1, 11000, 11000, 11000, 11000, 100],
+  [2, 10500, 10500, 10500, 10500, 100],
+  [3, 10500, 10500, 10500, 10500, 100],
+  [4, 10000, 10000, 10000, 10000, 100],
+  [5, 10000, 10000, 10000, 10000, 100],
+  [6, 9500, 9500, 9500, 9500, 100],
+  [7, 9500, 9500, 9500, 9500, 100],
+  [8, 9000, 9000, 9000, 9000, 100],
+  [9, 9000, 9000, 9000, 9000, 100],
+];
+
+const perfectGridChart = [
+  [1, 9000, 9000, 9000, 9000, 100],
+  [2, 9000, 9000, 9000, 9000, 100],
+  [3, 9500, 9500, 9500, 9500, 100],
+  [4, 9500, 9500, 9500, 9500, 100],
+  [5, 10000, 10000, 10000, 10000, 100],
+  [6, 10000, 10000, 10000, 10000, 100],
+  [7, 10500, 10500, 10500, 10500, 100],
+  [8, 10500, 10500, 10500, 10500, 100],
+  [9, 11000, 11000, 11000, 11000, 100],
+  [10, 11000, 11000, 11000, 11000, 100],
+  [11, 10500, 10500, 10500, 10500, 100],
+  [12, 10500, 10500, 10500, 10500, 100],
+  [13, 10000, 10000, 10000, 10000, 100],
+  [14, 10000, 10000, 10000, 10000, 100],
+  [15, 9500, 9500, 9500, 9500, 100],
+  [16, 9500, 9500, 9500, 9500, 100],
+  [17, 9000, 9000, 9000, 9000, 100],
+  [18, 9000, 9000, 9000, 9000, 100],
+  [19, 9000, 9000, 9000, 9000, 100],
+  [20, 9000, 9000, 9000, 9000, 100],
+  [21, 9500, 9500, 9500, 9500, 100],
+  [22, 9500, 9500, 9500, 9500, 100],
+  [23, 10000, 10000, 10000, 10000, 100],
+  [24, 10000, 10000, 10000, 10000, 100],
+  [25, 10500, 10500, 10500, 10500, 100],
+  [26, 10500, 10500, 10500, 10500, 100],
+  [27, 11000, 11000, 11000, 11000, 100],
+];
+
+describe('#Gridbot', () => {
   let gridBot: GridBot;
 
   beforeEach(() => {
@@ -57,14 +99,14 @@ describe.skip('#Gridbot', () => {
   });
 });
 
-describe.only('#Perfect Gridbot', () => {
+describe('#Perfect Gridbot', () => {
   let gridBot: GridBot;
 
   beforeEach(() => {
     gridBot = new GridBot(gridBotPerfect);
   });
 
-  it.only('should increase Quote up-trend', async () => {
+  it('should increase Quote up-trend', async () => {
     // Arrange
 
     // Act
@@ -86,6 +128,69 @@ describe.only('#Perfect Gridbot', () => {
       expect(grid.activeOrderId).toBeGreaterThan(1);
     });
 
-    expect(ExchangeBalance).toMatchObject({ balanceAsset: 0, balanceQuote: 1059.874949438876 });
+    expect(ExchangeBalance).toMatchObject({ balanceQuote: 1049.874949438876 });
+    expect(gridBot).toMatchObject({
+      balanceAsset: 0,
+      balanceQuote: 1049.874949438876,
+    });
   });
+
+  it('should increase Asset down-trend', async () => {
+    // Arrange
+
+    // Act
+    for (let i = 0; i < perfectDownTrendChart.length; i++) {
+      gridBot.update(perfectDownTrendChart[i] as OHLCV);
+    }
+
+    // Assert
+    const ExchangeOrders = gridBot.exchange.getOrders();
+
+    ExchangeOrders.forEach(order => {
+      gridBot.exchange.cancelOrder(order.orderId);
+    });
+
+    const ExchangeBalance = gridBot.exchange.getBalance();
+
+    gridBot.grids.forEach(grid => {
+      expect(grid.ownedQuantity).toBeGreaterThan(0);
+      expect(grid.activeOrderId).toBeGreaterThan(1);
+    });
+
+
+    expect(ExchangeBalance).toMatchObject({ balanceAsset: 0.1028258926975 });
+    expect(gridBot).toMatchObject({
+      balanceAsset: 0.1028258926975,
+    });
+  });
+
+  it('should generate Profit perfectGridChart', async () => {
+    // Arrange
+
+    // Act
+    for (let i = 0; i < perfectGridChart.length; i++) {
+      gridBot.update(perfectGridChart[i] as OHLCV);
+    }
+
+    // Assert
+    const ExchangeOrders = gridBot.exchange.getOrders();
+
+    ExchangeOrders.forEach(order => {
+      gridBot.exchange.cancelOrder(order.orderId);
+    });
+
+    const ExchangeBalance = gridBot.exchange.getBalance();
+
+    gridBot.grids.forEach(grid => {
+      expect(grid.ownedQuantity).toBe(0);
+      expect(grid.activeOrderId).toBeGreaterThan(1);
+    });
+
+
+    expect(ExchangeBalance).toMatchObject({ balanceAsset: 0, balanceQuote: 1099.749898877752 });
+
+  });
+
+
+
 });

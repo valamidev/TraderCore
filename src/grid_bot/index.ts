@@ -50,7 +50,7 @@ export class GridBot {
 
     this.exchange = new SandExchange({
       balanceAsset: this.balanceAsset,
-      balanceQuote: this.balanceQuote + 10,
+      balanceQuote: this.balanceQuote,
       fee: this.fee,
     });
 
@@ -82,10 +82,9 @@ export class GridBot {
         const grindIndex = this.grids.findIndex(grid => grid.activeOrderId === order.orderId);
 
         if (order.side === OrderSide.BUY) {
-          // TODO: calculate fee
           const bookedQuantity = order.executedQty * (1 - this.fee);
-
           this.balanceAsset += bookedQuantity;
+          this.balanceQuote -= order.executedQty * order.price;
 
           this.grids[grindIndex] = {
             ...this.grids[grindIndex],
@@ -94,9 +93,8 @@ export class GridBot {
         }
 
         if (order.side === OrderSide.SELL) {
-          // TODO: calculate fee
-
           this.balanceQuote += order.executedQty * order.price * (1 - this.fee);
+          this.balanceAsset -= order.executedQty;
 
           this.grids[grindIndex] = {
             ...this.grids[grindIndex],

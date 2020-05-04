@@ -5,10 +5,10 @@ import { OptimizeConfig, BacktestService } from '../services/backtest.service';
 
 @Controller('backtest')
 export class BacktestController {
-  constructor(private backtestService: BacktestService) {}
+  constructor(private backtestService: BacktestService) { }
 
   @Post('optimize')
-  async getAll(@Body() optimizeConfig: OptimizeConfig): Promise<any> {
+  async optimize(@Body() optimizeConfig: OptimizeConfig): Promise<any> {
     try {
       return await this.backtestService.optimize(optimizeConfig);
     } catch (err) {
@@ -17,4 +17,16 @@ export class BacktestController {
       throw new InternalServerErrorException();
     }
   }
+
+  @Post('gridbot')
+  async gridbot(@Body() optimizeConfig: OptimizeConfig): Promise<any> {
+    try {
+      return await this.backtestService.optimize(optimizeConfig);
+    } catch (err) {
+      logger.error(`NestJS API error, ${err}`);
+
+      throw new InternalServerErrorException();
+    }
+  }
+
 }

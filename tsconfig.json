@@ -8,7 +8,6 @@
     "allowSyntheticDefaultImports": true,
     "suppressImplicitAnyIndexErrors": true,
     "target": "es2017",
-    "newLine": "lf",
     "noImplicitAny": true,
     "moduleResolution": "node",
     "sourceMap": true,

@@ -19,13 +19,21 @@ class TradePairs {
     limit: number,
   ): Promise<batchedOHLCV | undefined> {
     try {
-      const limitCandlestick = ~~(limit + ((_.max(intervalsTimeInSec) as number) / EXCHANGE_BASE_INTERVAL_IN_SEC) * 1.5);
+      const limitCandlestick = ~~(
+        limit +
+        ((_.max(intervalsTimeInSec) as number) / EXCHANGE_BASE_INTERVAL_IN_SEC) * 1.5
+      );
 
       const batch = {};
       const result = new Map();
 
       if (exchange && symbol && intervalsTimeInSec && limitCandlestick) {
-        const candledata = await this._getCandlestickFromDB(exchange, symbol, EXCHANGE_BASE_INTERVAL_IN_SEC, limitCandlestick);
+        const candledata = await this.getCandlestickFromDB(
+          exchange,
+          symbol,
+          EXCHANGE_BASE_INTERVAL_IN_SEC,
+          limitCandlestick,
+        );
 
         batch[EXCHANGE_BASE_INTERVAL_IN_SEC] = candledata;
 
@@ -55,14 +63,19 @@ class TradePairs {
     }
   }
 
-  private async _getCandlestickFromDB(exchange: string, symbol: string, interval: number, limit: number): Promise<OHLCV[] | undefined> {
+  public async getCandlestickFromDB(
+    exchange: string,
+    symbol: string,
+    interval: number,
+    limit: number,
+  ): Promise<OHLCV[] | undefined> {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let rows: any = [];
 
       // TODO add proper support Tick Chart values
       if ([16, 32, 64, 128, 256, 512, 1024].indexOf(interval) >= 0) {
-        rows = await this.getTickchartFromDB(exchange, symbol, interval, limit);
+        rows = await this._getTickchartFromDB(exchange, symbol, interval, limit);
 
         // Sort by time asc
         rows = _.sortBy(rows, ['time']);
@@ -71,10 +84,12 @@ class TradePairs {
       }
 
       // Converted Candles
-      if (interval != EXCHANGE_BASE_INTERVAL_IN_SEC && limit != 0) {
+      if (interval !== EXCHANGE_BASE_INTERVAL_IN_SEC && limit !== 0) {
+        // eslint-disable-next-line no-param-reassign
         limit *= interval / EXCHANGE_BASE_INTERVAL_IN_SEC;
 
         // Limit should be always higher than convert ratio * 1,5 + 1
+        // eslint-disable-next-line no-param-reassign
         limit += (interval / EXCHANGE_BASE_INTERVAL_IN_SEC) * 1.5;
       }
 
@@ -83,7 +98,7 @@ class TradePairs {
       [rows] = await ExchangeDB.query('SELECT * FROM ?? ORDER BY `time` DESC LIMIT ?;', [tableName, ~~limit + 1]);
 
       // Convert into new time frame
-      if (interval != EXCHANGE_BASE_INTERVAL_IN_SEC) {
+      if (interval !== EXCHANGE_BASE_INTERVAL_IN_SEC) {
         rows = CandleConvert.json(rows, EXCHANGE_BASE_INTERVAL_IN_SEC, interval);
       }
 
@@ -96,11 +111,21 @@ class TradePairs {
     }
   }
 
-  public async getTickchartFromDB(exchange: string, symbol: string, tickLength: number, limit: number, time = 0): Promise<OHLCV[] | undefined> {
+  private async _getTickchartFromDB(
+    exchange: string,
+    symbol: string,
+    tickLength: number,
+    limit: number,
+    time = 0,
+  ): Promise<OHLCV[] | undefined> {
     try {
       const tableName = Utils.tradesName(exchange, symbol);
 
-      const [rows] = await ExchangeDB.query('SELECT * FROM ?? WHERE time > ? ORDER BY `time` DESC LIMIT ?;', [tableName, time, limit]);
+      const [rows] = await ExchangeDB.query('SELECT * FROM ?? WHERE time > ? ORDER BY `time` DESC LIMIT ?;', [
+        tableName,
+        time,
+        limit,
+      ]);
 
       return CandleConvert.tick_chart(rows as Trade[], tickLength);
     } catch (e) {

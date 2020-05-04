@@ -33,7 +33,7 @@ export class StrategyOptimizer {
       let value = elem[1][0] + (elem[1][1] - elem[1][0]) * Math.random();
 
       if (elem[1][2] === 'float') {
-        value = _.round(value, elem[1][3]);
+        value = _.floor(value, elem[1][3]);
       }
 
       if (elem[1][2] === 'int') {

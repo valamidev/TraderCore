@@ -29,7 +29,7 @@
     "@nestjs/platform-express": "^7.0.8",
     "@types/koa__cors": "^3.0.1",
     "axios": ">=0.19.0",
-    "bfx-hf-indicators": "^1.0.2",
+    "bfx-hf-indicators": "^2.0.0",
     "bigint-money": "^1.1.1",
     "candlestick-convert": "^5.0.0",
     "ccxt": "^1.18.995",

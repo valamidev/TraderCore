@@ -20,6 +20,7 @@ export type GridBotConfig = {
   gridQuantity: number;
   balanceQuote: number;
   fee: number;
+  precision?: number;
 };
 
 type Grid = {
@@ -33,13 +34,14 @@ type Grid = {
 export class GridBot {
   balanceQuote: number;
   balanceAsset: number;
-  quotePerGrid: number;
+  assetPerGrid: number;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   orderHistory: any[];
   grids: Grid[];
   exchange: SandExchange;
   syncedOrders: Set<number>;
   private readonly fee: number;
+  private readonly precision: number;
 
   constructor(config: GridBotConfig) {
     this.orderHistory = [];
@@ -47,23 +49,34 @@ export class GridBot {
     this.balanceQuote = config.balanceQuote;
     this.balanceAsset = 0;
     this.fee = config.fee;
+    this.precision = config.precision || DEFAULT_PRECISION;
 
     this.exchange = new SandExchange({
       balanceAsset: this.balanceAsset,
       balanceQuote: this.balanceQuote,
       fee: this.fee,
+      precision: this.precision,
     });
 
-    // Get last money partition ignore round-robin parts
-    this.quotePerGrid = this.balanceQuote / config.gridQuantity;
+    const pricePerStep = (config.priceHigh - config.priceLow) / config.gridQuantity;
+    const totalPriceStep = (config.gridQuantity ** 2 + config.gridQuantity) / 2; // n * n + n / 2
+
+    this.assetPerGrid = this.balanceQuote / (config.gridQuantity * config.priceLow + totalPriceStep * pricePerStep);
+    this.assetPerGrid = floor(this.assetPerGrid, DEFAULT_PRECISION);
 
     this.grids = [...Array(config.gridQuantity)].map((_, i) => {
       const priceLow = config.priceLow + ((config.priceHigh - config.priceLow) / config.gridQuantity) * i;
       const priceHigh = config.priceLow + ((config.priceHigh - config.priceLow) / config.gridQuantity) * (i + 1);
-      const maxQuantity = floor(this.quotePerGrid / priceLow, DEFAULT_PRECISION);
+
       const ownedQuantity = 0;
 
-      return { priceLow, priceHigh, maxQuantity, ownedQuantity, activeOrderId: null };
+      return {
+        priceLow,
+        priceHigh,
+        maxQuantity: this.assetPerGrid,
+        ownedQuantity,
+        activeOrderId: null,
+      };
     });
   }
 
@@ -82,7 +95,7 @@ export class GridBot {
         const grindIndex = this.grids.findIndex(grid => grid.activeOrderId === order.orderId);
 
         if (order.side === OrderSide.BUY) {
-          const bookedQuantity = order.executedQty * (1 - this.fee);
+          const bookedQuantity = floor(order.executedQty * (1 - this.fee), this.precision);
           this.balanceAsset += bookedQuantity;
           this.balanceQuote -= order.executedQty * order.price;
 
@@ -102,6 +115,7 @@ export class GridBot {
           };
         }
 
+        this.orderHistory.push(order);
         this.syncedOrders.add(order.orderId);
       }
     });

@@ -1,14 +1,14 @@
 import { Controller, Post, InternalServerErrorException, Body } from '@nestjs/common';
 
 import { logger } from '../../logger';
-import { GridbotService } from '../services/gridbot.service';
+import { GridbotService, GridbotConfig } from '../services/gridbot.service';
 
 @Controller('gridbot')
 export class GridbotController {
-  constructor(private gridbotService: GridbotService) { }
+  constructor(private gridbotService: GridbotService) {}
 
   @Post('backtest')
-  async backtest(@Body() gridbotConfig: any): Promise<any> {
+  async backtest(@Body() gridbotConfig: GridbotConfig): Promise<any> {
     try {
       return await this.gridbotService.backtest(gridbotConfig);
     } catch (err) {

@@ -1,16 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { OHLCV } from 'sand-ex/build/types';
-import _ from 'lodash';
+// import _ from 'lodash';
 
 import tradePairs from '../../tradepairs/tradepairs';
 import { GridBotConfig, GridBot } from '../../grid_bot';
 
+export interface GridbotConfig {
+  exchange: string;
+  symbol: string;
+  priceLow: number;
+  priceHigh: number;
+  gridQuantity: number;
+  fee: number;
+  rangeInDays: number;
+}
+
 @Injectable()
 export class GridbotService {
-  async backtest(config: any): Promise<any> {
-    const exchange = 'binance';
-    const symbol = 'BTC/USDT';
-    const candleLimit = 1440 * 30;
+  async backtest(gridbotConfig: GridbotConfig): Promise<any> {
+    const exchange = gridbotConfig.exchange ?? 'binance';
+    const symbol = gridbotConfig.symbol ?? 'BTC/USDT';
+    const { rangeInDays, priceLow, priceHigh, gridQuantity } = gridbotConfig;
+    const fee = gridbotConfig.fee ?? 0.00075; // 0.0075% / 100,
+
+    const candleLimit = 1440 * rangeInDays;
+
+    const testQuote = 100000;
 
     const candleData = await tradePairs.getCandlestickFromDB(exchange, symbol, 60, candleLimit);
 
@@ -19,27 +34,32 @@ export class GridbotService {
 
       // Strategy optimizer, helper function
       const gridBotConfig: GridBotConfig = {
-        priceLow: 7500,
-        priceHigh: 10000,
-        gridQuantity: 8,
-        balanceQuote: 10000,
-        fee: 0.00075, // 0.0075% / 100,
+        priceLow,
+        priceHigh,
+        gridQuantity,
+        balanceQuote: testQuote,
+        fee,
       };
 
       const gridBot = new GridBot(gridBotConfig);
 
-      console.log(candleSticks.length);
+      const profits = [];
 
       for (let i = 0; i < candleSticks.length; i++) {
         gridBot.update((candleSticks[i] as unknown) as OHLCV);
+
+        profits.push(gridBot.balanceQuote + gridBot.balanceAsset * candleSticks[candleSticks.length - 1][4]);
       }
 
-      console.log(gridBot.exchange.getOrders().length);
+      const totalEndBalance = gridBot.balanceQuote + gridBot.balanceAsset * candleSticks[candleSticks.length - 1][4];
 
-      console.log(gridBot.balanceAsset);
-      console.log(gridBot.balanceQuote + gridBot.balanceAsset * candleSticks[candleSticks.length - 1][4]);
-
-      return '';
+      return {
+        balanceAsset: gridBot.balanceAsset,
+        balanceQuote: gridBot.balanceQuote,
+        totalEndBalance,
+        profitPct: (totalEndBalance / 100000 - 1) * 100,
+        orderHistory: gridBot.orderHistory,
+      };
     }
   }
 }

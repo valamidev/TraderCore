@@ -82,7 +82,14 @@ describe('#Gridbot', () => {
   });
 
   it('should Constructor set the properties', async () => {
-    expect(gridBot.quotePerGrid).toBe(gridBotConfig.balanceQuote / gridBotConfig.gridQuantity);
+
+    let sumGridQuote = 0;
+
+    gridBot.grids.forEach(e => {
+      sumGridQuote += e.maxQuantity * e.priceLow;
+    });
+
+    expect(sumGridQuote).toBeLessThanOrEqual(gridBotConfig.balanceQuote);
     expect(gridBot.grids).toHaveLength(gridBotConfig.gridQuantity);
   });
 
@@ -128,10 +135,10 @@ describe('#Perfect Gridbot', () => {
       expect(grid.activeOrderId).toBeGreaterThan(1);
     });
 
-    expect(ExchangeBalance).toMatchObject({ balanceQuote: 1049.874949438876 });
+    expect(ExchangeBalance).toMatchObject({ balanceQuote: 1047.28074283 });
     expect(gridBot).toMatchObject({
       balanceAsset: 0,
-      balanceQuote: 1049.874949438876,
+      balanceQuote: 1047.2807428449998,
     });
   });
 
@@ -158,9 +165,9 @@ describe('#Perfect Gridbot', () => {
     });
 
 
-    expect(ExchangeBalance).toMatchObject({ balanceAsset: 0.1028258926975 });
+    expect(ExchangeBalance).toMatchObject({ balanceAsset: 0.09748776 });
     expect(gridBot).toMatchObject({
-      balanceAsset: 0.1028258926975,
+      balanceAsset: 0.09748776,
     });
   });
 
@@ -187,7 +194,7 @@ describe('#Perfect Gridbot', () => {
     });
 
 
-    expect(ExchangeBalance).toMatchObject({ balanceAsset: 0, balanceQuote: 1099.749898877752 });
+    expect(ExchangeBalance).toMatchObject({ balanceAsset: 0, balanceQuote: 1094.56148566 });
 
   });
 

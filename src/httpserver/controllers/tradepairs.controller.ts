@@ -1,5 +1,6 @@
-import { Controller, Get, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Get, InternalServerErrorException, Query } from '@nestjs/common';
 import { RowDataPacket } from 'mysql2';
+import { OHLCV } from 'candlestick-convert';
 import { TradepairsService } from '../services/tradepairs.service';
 import { logger } from '../../logger';
 
@@ -11,6 +12,25 @@ export class TradepairsController {
   async getAll(): Promise<RowDataPacket[] | undefined> {
     try {
       return await this.tradepairsService.getAll();
+    } catch (err) {
+      logger.error(`NestJS API error, ${err}`);
+
+      throw new InternalServerErrorException();
+    }
+  }
+
+  @Get('candlestick')
+  async getCandleStick(@Query() params: any): Promise<OHLCV[]> {
+    try {
+      const { exchange, symbol, interval, limit } = params;
+
+      const candleStick = await this.tradepairsService.getCandleStick(exchange, symbol, interval, limit);
+
+      if (!candleStick) {
+        return [];
+      }
+
+      return candleStick;
     } catch (err) {
       logger.error(`NestJS API error, ${err}`);
 

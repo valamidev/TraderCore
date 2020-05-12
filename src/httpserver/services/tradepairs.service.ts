@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { RowDataPacket } from 'mysql2';
 
-import { OHLCV } from 'candlestick-convert';
+import { IOHLCV } from 'candlestick-convert';
 import tradePairs from '../../tradepairs/tradepairs';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class TradepairsService {
     symbol: string,
     interval: number,
     limit: number,
-  ): Promise<OHLCV[] | undefined> {
+  ): Promise<IOHLCV[] | undefined> {
     try {
       return await tradePairs.getCandlestickFromDB(exchange, symbol, interval, limit);
     } catch (err) {

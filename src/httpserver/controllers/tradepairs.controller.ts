@@ -1,12 +1,12 @@
 import { Controller, Get, InternalServerErrorException, Query } from '@nestjs/common';
 import { RowDataPacket } from 'mysql2';
-import { OHLCV } from 'candlestick-convert';
+import { IOHLCV } from 'candlestick-convert';
 import { TradepairsService } from '../services/tradepairs.service';
 import { logger } from '../../logger';
 
 @Controller('tradepairs')
 export class TradepairsController {
-  constructor(private tradepairsService: TradepairsService) {}
+  constructor(private tradepairsService: TradepairsService) { }
 
   @Get('all')
   async getAll(): Promise<RowDataPacket[] | undefined> {
@@ -20,7 +20,7 @@ export class TradepairsController {
   }
 
   @Get('candlestick')
-  async getCandleStick(@Query() params: any): Promise<OHLCV[]> {
+  async getCandleStick(@Query() params: any): Promise<IOHLCV[]> {
     try {
       const { exchange, symbol, interval, limit } = params;
 

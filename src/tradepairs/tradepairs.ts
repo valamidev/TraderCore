@@ -1,7 +1,7 @@
 /* eslint-disable no-extra-semi */
 
 import _ from 'lodash';
-import CandleConvert, { Trade, OHLCV } from 'candlestick-convert';
+import CandleConvert, { Trade, OHLCV, IOHLCV } from 'candlestick-convert';
 import { RowDataPacket } from 'mysql2';
 
 import { batchedOHLCV } from '../types';
@@ -47,7 +47,7 @@ class TradePairs {
           for (let i = 0; i < intervalsTimeInSec.length; i++) {
             const interval = intervalsTimeInSec[i];
 
-            batch[interval] = CandleConvert.json(candledata as OHLCV[], EXCHANGE_BASE_INTERVAL_IN_SEC, interval);
+            batch[interval] = CandleConvert.json(candledata as IOHLCV[], EXCHANGE_BASE_INTERVAL_IN_SEC, interval);
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             batch[interval].map((elem: any) => {
@@ -68,7 +68,7 @@ class TradePairs {
     symbol: string,
     interval: number,
     limit: number,
-  ): Promise<OHLCV[] | undefined> {
+  ): Promise<IOHLCV[] | undefined> {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let rows: any = [];
@@ -117,7 +117,7 @@ class TradePairs {
     tickLength: number,
     limit: number,
     time = 0,
-  ): Promise<OHLCV[] | undefined> {
+  ): Promise<IOHLCV[] | undefined> {
     try {
       const tableName = Utils.tradesName(exchange, symbol);
 

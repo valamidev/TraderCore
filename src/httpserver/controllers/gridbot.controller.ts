@@ -12,7 +12,7 @@ export class GridbotController {
     try {
       return await this.gridbotService.backtest(gridbotConfig);
     } catch (err) {
-      logger.error(`NestJS API error, ${err} , Body: ${gridbotConfig}`);
+      logger.error(`NestJS API error, ${err} , Body: ${JSON.stringify(gridbotConfig)}`);
 
       throw new InternalServerErrorException();
     }

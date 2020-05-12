@@ -11,6 +11,7 @@ import SandExchange from 'sand-ex';
 import { floor } from 'lodash';
 
 import { OHLCV, OrderStatus, OrderType, OrderSide } from 'sand-ex/build/types';
+import { logger } from '../logger';
 
 const DEFAULT_PRECISION = 8;
 
@@ -127,26 +128,49 @@ export class GridBot {
       // Buy
       if (currentPrice >= priceLow && activeOrderId === null && ownedQuantity === 0) {
         const requiredQuantity = maxQuantity;
-        const orderInfo = this.exchange.createNewOrder({
-          side: OrderSide.BUY,
-          type: OrderType.LIMIT,
-          price: priceLow,
-          quantity: requiredQuantity,
-        });
 
-        return { ...grid, ...{ activeOrderId: orderInfo.orderId } };
+        try {
+          const orderInfo = this.exchange.createNewOrder({
+            side: OrderSide.BUY,
+            type: OrderType.LIMIT,
+            price: priceLow,
+            quantity: requiredQuantity,
+          });
+
+          return { ...grid, ...{ activeOrderId: orderInfo.orderId } };
+        } catch (err) {
+          logger.error(
+            `Gridbot createNewOrder error, details: ${JSON.stringify({
+              side: OrderSide.BUY,
+              type: OrderType.LIMIT,
+              price: priceLow,
+              quantity: requiredQuantity,
+            })} `,
+          );
+        }
       }
 
       // Sell
       if (currentPrice <= priceHigh && activeOrderId === null && ownedQuantity !== 0) {
-        const orderInfo = this.exchange.createNewOrder({
-          side: OrderSide.SELL,
-          type: OrderType.LIMIT,
-          price: priceHigh,
-          quantity: ownedQuantity,
-        });
+        try {
+          const orderInfo = this.exchange.createNewOrder({
+            side: OrderSide.SELL,
+            type: OrderType.LIMIT,
+            price: priceHigh,
+            quantity: ownedQuantity,
+          });
 
-        return { ...grid, ...{ activeOrderId: orderInfo.orderId } };
+          return { ...grid, ...{ activeOrderId: orderInfo.orderId } };
+        } catch (err) {
+          logger.error(
+            `Gridbot createNewOrder error, details: ${JSON.stringify({
+              side: OrderSide.SELL,
+              type: OrderType.LIMIT,
+              price: priceHigh,
+              quantity: ownedQuantity,
+            })} `,
+          );
+        }
       }
 
       return { ...grid };

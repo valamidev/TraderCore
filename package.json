@@ -41,7 +41,7 @@
     "koa-router": "^7.4.0",
     "lodash": "^4.17.15",
     "math": "0.0.3",
-    "mathjs": "^5.10.0",
+    "mathjs": "^8.0.0",
     "mysql2": "^1.6.5",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
